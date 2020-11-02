@@ -33,7 +33,7 @@ def on_button_pressed(cli, pkt: pycozmo.protocol_encoder.ButtonPressed):
         print("Button released.")
 
 
-def on_robot_picked_up(cli, state):
+def on_robot_picked_up(cli, state: bool):
     del cli
     if state:
         print("Picked up.")
@@ -41,7 +41,7 @@ def on_robot_picked_up(cli, state):
         print("Put down.")
 
 
-def on_robot_charging(cli, state):
+def on_robot_charging(cli, state: bool):
     del cli
     if state:
         print("Started charging.")
@@ -49,13 +49,13 @@ def on_robot_charging(cli, state):
         print("Stopped charging.")
 
 
-def on_cliff_detected(cli, state):
+def on_cliff_detected(cli, state: bool):
     del cli
     if state:
         print("Cliff detected.")
 
 
-def on_robot_wheels_moving(cli, state):
+def on_robot_wheels_moving(cli, state: bool):
     del cli
     if state:
         print("Started moving.")
@@ -65,15 +65,15 @@ def on_robot_wheels_moving(cli, state):
 
 def pycozmo_program(cli: pycozmo.client.Client):
 
-    cli.add_handler(pycozmo.protocol_encoder.RobotState, on_robot_state, one_shot=True)
-    cli.add_handler(pycozmo.protocol_encoder.RobotPoked, on_robot_poked)
-    cli.add_handler(pycozmo.protocol_encoder.FallingStarted, on_robot_falling_started)
-    cli.add_handler(pycozmo.protocol_encoder.FallingStopped, on_robot_falling_stopped)
-    cli.add_handler(pycozmo.protocol_encoder.ButtonPressed, on_button_pressed)
-    cli.add_handler(pycozmo.client.EvtRobotPickedUpChange, on_robot_picked_up)
-    cli.add_handler(pycozmo.client.EvtRobotChargingChange, on_robot_charging)
-    cli.add_handler(pycozmo.client.EvtCliffDetectedChange, on_cliff_detected)
-    cli.add_handler(pycozmo.client.EvtRobotWheelsMovingChange, on_robot_wheels_moving)
+    cli.conn.add_handler(pycozmo.protocol_encoder.RobotState, on_robot_state, one_shot=True)
+    cli.conn.add_handler(pycozmo.protocol_encoder.RobotPoked, on_robot_poked)
+    cli.conn.add_handler(pycozmo.protocol_encoder.FallingStarted, on_robot_falling_started)
+    cli.conn.add_handler(pycozmo.protocol_encoder.FallingStopped, on_robot_falling_stopped)
+    cli.conn.add_handler(pycozmo.protocol_encoder.ButtonPressed, on_button_pressed)
+    cli.add_handler(pycozmo.event.EvtRobotPickedUpChange, on_robot_picked_up)
+    cli.add_handler(pycozmo.event.EvtRobotChargingChange, on_robot_charging)
+    cli.add_handler(pycozmo.event.EvtCliffDetectedChange, on_cliff_detected)
+    cli.add_handler(pycozmo.event.EvtRobotWheelsMovingChange, on_robot_wheels_moving)
 
     while True:
         try:
@@ -82,4 +82,5 @@ def pycozmo_program(cli: pycozmo.client.Client):
             break
 
 
-pycozmo.run_program(pycozmo_program)
+# Change the robot log level to DEBUG to see robot debug messages related to events.
+pycozmo.run_program(pycozmo_program, robot_log_level="INFO")

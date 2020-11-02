@@ -14,7 +14,7 @@ try:
     # noinspection PyPackageRequirements
     from evdev import ecodes, InputDevice
 except ImportError:
-    sys.exit("ERROR: This application can only run on Linux with evdev installed. Do 'pip install evdev'.")
+    sys.exit("ERROR: This application can only run on Linux with evdev installed. Do 'pip install --user evdev'.")
 
 import pycozmo
 
@@ -42,7 +42,7 @@ class XboxController(object):
     @classmethod
     def get_deviceid(cls, f):
         # Read device identity and capabilities
-        buf = "\0" * 8
+        buf = b"\0" * 8
         try:
             res = ioctl(f, cls.EVIOCGID, buf)
             bus, vendor, product, version = unpack("hhhh", res)
@@ -147,8 +147,7 @@ class RCApp(object):
         self.cli.wait_for_robot()
         # Raise head
         angle = (pycozmo.robot.MAX_HEAD_ANGLE.radians - pycozmo.robot.MIN_HEAD_ANGLE.radians) * 0.1
-        pkt = pycozmo.protocol_encoder.SetHeadAngle(angle_rad=angle)
-        self.cli.send(pkt)
+        self.cli.set_head_angle(angle)
         time.sleep(0.5)
         return True
 
@@ -156,7 +155,7 @@ class RCApp(object):
         """ Terminate application. """
         logging.info("Terminating...")
 
-        self.cli.send(pycozmo.protocol_encoder.StopAllMotors())
+        self.cli.stop_all_motors()
         self.cli.disconnect()
         self.cli.stop()
 
@@ -182,17 +181,17 @@ class RCApp(object):
 
     def _drive_lift(self, speed):
         if self.lift:
-            self.cli.send(pycozmo.protocol_encoder.DriveLift(speed))
+            self.cli.move_lift(speed)
         else:
-            self.cli.send(pycozmo.protocol_encoder.DriveHead(speed))
+            self.cli.move_head(speed)
 
     def _drive_wheels(self, speed_left, speed_right):
         lw = int(speed_left * pycozmo.MAX_WHEEL_SPEED.mmps)
         rw = int(speed_right * pycozmo.MAX_WHEEL_SPEED.mmps)
-        self.cli.send(pycozmo.protocol_encoder.DriveWheels(lwheel_speed_mmps=lw, rwheel_speed_mmps=rw))
+        self.cli.drive_wheels(lwheel_speed=lw, rwheel_speed=rw)
 
     @staticmethod
-    def _get_motor_thrust(r, theta):
+    def get_motor_thrust(r: float, theta: float):
         """
         Convert throttle and steering angle to left and right motor thrust.
 
@@ -217,7 +216,7 @@ class RCApp(object):
         else:
             return v_a, -v_b
 
-    def _handle_input(self, e):
+    def _handle_input(self, e):     # noqa: C901
         update = False
         update2 = False
 
@@ -310,7 +309,7 @@ class RCApp(object):
             if r < 0:
                 r *= -1.0
                 theta += 180.0
-            v_a, v_b = self._get_motor_thrust(r, theta)
+            v_a, v_b = self.get_motor_thrust(r, theta)
             logging.debug("r: {:.02f}; theta: {:.02f}; v_a: {:.02f}; v_b: {:.02f};".format(
                 r, theta, v_a, v_b))
             self._drive_wheels(v_a, v_b)

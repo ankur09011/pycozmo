@@ -1,8 +1,8 @@
 """
 
-Protocol packet encoder classes.
+Cozmo protocol packet encoder classes, based on protocol version 2381.
 
-Generated from protocol_declaration.py by protocol_generator.py
+Generated from protocol_declaration.py by protocol_generator.py .
 
 Do not modify.
 
@@ -10,7 +10,7 @@ Do not modify.
 
 import enum
 
-from .protocol_declaration import PacketType
+from .protocol_ast import PacketType
 from .protocol_base import Struct, Packet
 from .protocol_utils import \
     validate_float, validate_bool, validate_integer, validate_object, \
@@ -23,50 +23,55 @@ class BodyColor(enum.Enum):
     UNKNOWN = -1
     WHITE_v10 = 0
     RESERVED = 1
+    # White.
     WHITE_v15 = 2
+    # Collectors edition, liquid metal.
     CE_LM_v15 = 3
+    # Limited edition, blue.
     LE_BL_v16 = 4
+    # Development unit.
+    DEV = 5
 
 
 class NvEntryTag(enum.Enum):
-    NVEntry_Invalid = 4294967295
-    NVEntry_GameSkillLevels = 1572864
-    NVEntry_OnboardingData = 1576960
-    NVEntry_GameUnlocks = 1581056
-    NVEntry_FaceEnrollData = 1585152
-    NVEntry_FaceAlbumData = 1589248
-    NVEntry_NurtureGameData = 1654784
-    NVEntry_InventoryData = 1658880
-    NVEntry_LabAssignments = 1662976
-    NVEntry_SavedCubeIDs = 1667072
-    NVEntry_NEXT_SLOT = 1671168
-    NVEntry_FACTORY_RESERVED1 = 1835008
-    NVEntry_FACTORY_RESERVED2 = 1957888
-    NVEntry_BirthCertificate = 2147483648
-    NVEntry_CameraCalib = 2147483649
-    NVEntry_ToolCodeInfo = 2147483650
-    NVEntry_CalibPose = 2147483651
-    NVEntry_CalibMetaInfo = 2147483652
-    NVEntry_ObservedCubePose = 2147483653
-    NVEntry_IMUInfo = 2147483654
-    NVEntry_CliffValOnDrop = 2147483655
-    NVEntry_CliffValOnGround = 2147483656
-    NVEntry_PlaypenTestResults = 2147483664
-    NVEntry_FactoryLock = 2147483665
-    NVEntry_VersionMagic = 2147483666
-    NVEntry_CalibImage1 = 2147549184
-    NVEntry_CalibImage2 = 2147614720
-    NVEntry_CalibImage3 = 2147680256
-    NVEntry_CalibImage4 = 2147745792
-    NVEntry_CalibImage5 = 2147811328
-    NVEntry_CalibImage6 = 2147876864
-    NVEntry_ToolCodeImageLeft = 2148532224
-    NVEntry_ToolCodeImageRight = 2148597760
-    NVEntry_PrePlaypenResults = 3221225472
-    NVEntry_PrePlaypenCentroids = 3221225473
-    NVEntry_IMUAverages = 3221225476
-    NVEntry_FactoryBaseTag = 909312
-    NVEntry_FactoryBaseTagWithBCOffset = 909360
+    NVEntry_Invalid = 0xffffffff
+    NVEntry_GameSkillLevels = 0x180000
+    NVEntry_OnboardingData = 0x181000
+    NVEntry_GameUnlocks = 0x182000
+    NVEntry_FaceEnrollData = 0x183000
+    NVEntry_FaceAlbumData = 0x184000
+    NVEntry_NurtureGameData = 0x194000
+    NVEntry_InventoryData = 0x195000
+    NVEntry_LabAssignments = 0x196000
+    NVEntry_SavedCubeIDs = 0x197000
+    NVEntry_NEXT_SLOT = 0x198000
+    NVEntry_FACTORY_RESERVED1 = 0x1c0000
+    NVEntry_FACTORY_RESERVED2 = 0x1de000
+    NVEntry_BirthCertificate = 0x80000000
+    NVEntry_CameraCalib = 0x80000001
+    NVEntry_ToolCodeInfo = 0x80000002
+    NVEntry_CalibPose = 0x80000003
+    NVEntry_CalibMetaInfo = 0x80000004
+    NVEntry_ObservedCubePose = 0x80000005
+    NVEntry_IMUInfo = 0x80000006
+    NVEntry_CliffValOnDrop = 0x80000007
+    NVEntry_CliffValOnGround = 0x80000008
+    NVEntry_PlaypenTestResults = 0x80000010
+    NVEntry_FactoryLock = 0x80000011
+    NVEntry_VersionMagic = 0x80000012
+    NVEntry_CalibImage1 = 0x80010000
+    NVEntry_CalibImage2 = 0x80020000
+    NVEntry_CalibImage3 = 0x80030000
+    NVEntry_CalibImage4 = 0x80040000
+    NVEntry_CalibImage5 = 0x80050000
+    NVEntry_CalibImage6 = 0x80060000
+    NVEntry_ToolCodeImageLeft = 0x80100000
+    NVEntry_ToolCodeImageRight = 0x80110000
+    NVEntry_PrePlaypenResults = 0xc0000000
+    NVEntry_PrePlaypenCentroids = 0xc0000001
+    NVEntry_IMUAverages = 0xc0000004
+    NVEntry_FactoryBaseTag = 0xde000
+    NVEntry_FactoryBaseTagWithBCOffset = 0xde030
 
 
 class NvOperation(enum.Enum):
@@ -168,8 +173,10 @@ class ImageResolution(enum.Enum):
     QQQQVGA = 1
     QQQVGA = 2
     QQVGA = 3
+    # 320x240
     QVGA = 4
     CVGA = 5
+    # 640x480
     VGA = 6
     SVGA = 7
     XGA = 8
@@ -181,16 +188,35 @@ class ImageResolution(enum.Enum):
     ImageResolutionNone = 14
 
 
+class ImageSendMode(enum.Enum):
+    Off = 0
+    Stream = 1
+    SingleShot = 2
+
+
+class MotorID(enum.Enum):
+    MOTOR_LEFT_WHEEL = 0
+    MOTOR_RIGHT_WHEEL = 1
+    MOTOR_LIFT = 2
+    MOTOR_HEAD = 3
+
+
+class PathEventType(enum.Enum):
+    PATH_STARTED = 0
+    PATH_INTERRUPTED = 1
+    PATH_COMPLETED = 2
+
+
 class LightState(Struct):
 
     __slots__ = (
-        "_on_color",
-        "_off_color",
-        "_on_frames",
-        "_off_frames",
-        "_transition_on_frames",
-        "_transition_off_frames",
-        "_offset",
+        "_on_color",  # uint16
+        "_off_color",  # uint16
+        "_on_frames",  # uint8
+        "_off_frames",  # uint8
+        "_transition_on_frames",  # uint8
+        "_transition_off_frames",  # uint8
+        "_offset",  # int16
     )
 
     def __init__(self,
@@ -297,7 +323,7 @@ class LightState(Struct):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._on_color, "H")
         writer.write(self._off_color, "H")
@@ -312,7 +338,7 @@ class LightState(Struct):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         on_color = reader.read("H")
@@ -331,15 +357,100 @@ class LightState(Struct):
             transition_off_frames=transition_off_frames,
             offset=offset)
 
-    
+
+class PathSegmentSpeed(Struct):
+
+    __slots__ = (
+        "_speed_mmps",  # float
+        "_accel_mmps2",  # float
+        "_decel_mmps2",  # float
+    )
+
+    def __init__(self,
+                 speed_mmps=0.0,
+                 accel_mmps2=0.0,
+                 decel_mmps2=0.0):
+        # Speed in millimeters per second.
+        self.speed_mmps = speed_mmps
+        # Acceleration in millimeters per second squared.
+        self.accel_mmps2 = accel_mmps2
+        # Deceleration in millimeters per second squared.
+        self.decel_mmps2 = decel_mmps2
+
+    @property
+    def speed_mmps(self):
+        return self._speed_mmps
+
+    @speed_mmps.setter
+    def speed_mmps(self, value):
+        self._speed_mmps = validate_float("speed_mmps", value)
+
+    @property
+    def accel_mmps2(self):
+        return self._accel_mmps2
+
+    @accel_mmps2.setter
+    def accel_mmps2(self, value):
+        self._accel_mmps2 = validate_float("accel_mmps2", value)
+
+    @property
+    def decel_mmps2(self):
+        return self._decel_mmps2
+
+    @decel_mmps2.setter
+    def decel_mmps2(self, value):
+        self._decel_mmps2 = validate_float("decel_mmps2", value)
+
+    def __len__(self):
+        return \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f')
+
+    def __repr__(self):
+        return "{type}(" \
+               "speed_mmps={speed_mmps}, " \
+               "accel_mmps2={accel_mmps2}, " \
+               "decel_mmps2={decel_mmps2})".format(
+                type=type(self).__name__,
+                speed_mmps=self._speed_mmps,
+                accel_mmps2=self._accel_mmps2,
+                decel_mmps2=self._decel_mmps2)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._speed_mmps, "f")
+        writer.write(self._accel_mmps2, "f")
+        writer.write(self._decel_mmps2, "f")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        speed_mmps = reader.read("f")
+        accel_mmps2 = reader.read("f")
+        decel_mmps2 = reader.read("f")
+        return cls(
+            speed_mmps=speed_mmps,
+            accel_mmps2=accel_mmps2,
+            decel_mmps2=decel_mmps2)
+
+
 class Connect(Packet):
 
-    PACKET_ID = PacketType.CONNECT
-
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.CONNECT, packet_id=None)
         pass
 
     def __len__(self):
@@ -352,7 +463,7 @@ class Connect(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -361,22 +472,21 @@ class Connect(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
+
 class Disconnect(Packet):
 
-    PACKET_ID = PacketType.DISCONNECT
-
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.DISCONNECT, packet_id=None)
         pass
 
     def __len__(self):
@@ -389,7 +499,7 @@ class Disconnect(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -398,23 +508,21 @@ class Disconnect(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
+
 class Ping(Packet):
 
-    PACKET_ID = PacketType.PING
-
     __slots__ = (
-        "_time_sent_ms",
-        "_counter",
-        "_last",
-        "_unknown",
+        "_time_sent_ms",  # double
+        "_counter",  # uint32
+        "_last",  # uint32
+        "_unknown",  # uint8
     )
 
     def __init__(self,
@@ -422,6 +530,7 @@ class Ping(Packet):
                  counter=0,
                  last=0,
                  unknown=0):
+        super().__init__(PacketType.PING, packet_id=None)
         self.time_sent_ms = time_sent_ms
         self.counter = counter
         self.last = last
@@ -482,7 +591,7 @@ class Ping(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._time_sent_ms, "d")
         writer.write(self._counter, "L")
@@ -494,7 +603,7 @@ class Ping(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         time_sent_ms = reader.read("d")
@@ -507,15 +616,14 @@ class Ping(Packet):
             last=last,
             unknown=unknown)
 
-    
-class Unknown0A(Packet):
 
-    PACKET_ID = PacketType.UNKNOWN_0A
+class Keyframe(Packet):
 
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.KEYFRAME, packet_id=None)
         pass
 
     def __len__(self):
@@ -528,7 +636,7 @@ class Unknown0A(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -537,27 +645,26 @@ class Unknown0A(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
+
 class LightStateCenter(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x03
-
     __slots__ = (
-        "_states",
-        "_unknown",
+        "_states",  # LightState[3]
+        "_unknown",  # uint8
     )
 
     def __init__(self,
                  states=(),
                  unknown=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x03)
+        # Top, middle, and bottom light state.
         self.states = states
         self.unknown = unknown
 
@@ -595,7 +702,7 @@ class LightStateCenter(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write_object_farray(self._states, 3)
         writer.write(self._unknown, "B")
@@ -605,7 +712,7 @@ class LightStateCenter(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         states = reader.read_object_farray(LightState.from_reader, 3)
@@ -614,18 +721,16 @@ class LightStateCenter(Packet):
             states=states,
             unknown=unknown)
 
-    
+
 class CubeLights(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x04
-
     __slots__ = (
-        "_states",
+        "_states",  # LightState[4]
     )
 
     def __init__(self,
                  states=()):
+        super().__init__(PacketType.COMMAND, packet_id=0x04)
         self.states = states
 
     @property
@@ -651,7 +756,7 @@ class CubeLights(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write_object_farray(self._states, 4)
 
@@ -660,27 +765,25 @@ class CubeLights(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         states = reader.read_object_farray(LightState.from_reader, 4)
         return cls(
             states=states)
 
-    
+
 class ObjectConnect(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x05
-
     __slots__ = (
-        "_factory_id",
-        "_connect",
+        "_factory_id",  # uint32
+        "_connect",  # bool
     )
 
     def __init__(self,
                  factory_id=0,
                  connect=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x05)
         self.factory_id = factory_id
         self.connect = connect
 
@@ -717,7 +820,7 @@ class ObjectConnect(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._factory_id, "L")
         writer.write(int(self._connect), "b")
@@ -727,7 +830,7 @@ class ObjectConnect(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         factory_id = reader.read("L")
@@ -736,18 +839,83 @@ class ObjectConnect(Packet):
             factory_id=factory_id,
             connect=connect)
 
-    
-class SetHeadLight(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x0b
+class StreamObjectAccel(Packet):
 
     __slots__ = (
-        "_enable",
+        "_object_id",  # uint32
+        "_enable",  # bool
+    )
+
+    def __init__(self,
+                 object_id=0,
+                 enable=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x08)
+        self.object_id = object_id
+        self.enable = enable
+
+    @property
+    def object_id(self):
+        return self._object_id
+
+    @object_id.setter
+    def object_id(self, value):
+        self._object_id = validate_integer("object_id", value, 0, 4294967295)
+
+    @property
+    def enable(self):
+        return self._enable
+
+    @enable.setter
+    def enable(self, value):
+        self._enable = validate_bool("enable", value)
+
+    def __len__(self):
+        return \
+            get_size('L') + \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "object_id={object_id}, " \
+               "enable={enable})".format(
+                type=type(self).__name__,
+                object_id=self._object_id,
+                enable=self._enable)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._object_id, "L")
+        writer.write(int(self._enable), "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        object_id = reader.read("L")
+        enable = bool(reader.read("b"))
+        return cls(
+            object_id=object_id,
+            enable=enable)
+
+
+class SetAccessoryDiscovery(Packet):
+
+    __slots__ = (
+        "_enable",  # bool
     )
 
     def __init__(self,
                  enable=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x0a)
         self.enable = enable
 
     @property
@@ -772,7 +940,7 @@ class SetHeadLight(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(int(self._enable), "b")
 
@@ -781,27 +949,75 @@ class SetHeadLight(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         enable = bool(reader.read("b"))
         return cls(
             enable=enable)
 
-    
-class CubeId(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x10
+class SetHeadLight(Packet):
 
     __slots__ = (
-        "_object_id",
-        "_rotation_period_frames",
+        "_enable",  # bool
+    )
+
+    def __init__(self,
+                 enable=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x0b)
+        self.enable = enable
+
+    @property
+    def enable(self):
+        return self._enable
+
+    @enable.setter
+    def enable(self, value):
+        self._enable = validate_bool("enable", value)
+
+    def __len__(self):
+        return \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "enable={enable})".format(
+                type=type(self).__name__,
+                enable=self._enable)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(int(self._enable), "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        enable = bool(reader.read("b"))
+        return cls(
+            enable=enable)
+
+
+class CubeId(Packet):
+
+    __slots__ = (
+        "_object_id",  # uint32
+        "_rotation_period_frames",  # uint8
     )
 
     def __init__(self,
                  object_id=0,
                  rotation_period_frames=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x10)
         self.object_id = object_id
         self.rotation_period_frames = rotation_period_frames
 
@@ -838,7 +1054,7 @@ class CubeId(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._object_id, "L")
         writer.write(self._rotation_period_frames, "B")
@@ -848,7 +1064,7 @@ class CubeId(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         object_id = reader.read("L")
@@ -857,20 +1073,19 @@ class CubeId(Packet):
             object_id=object_id,
             rotation_period_frames=rotation_period_frames)
 
-    
+
 class LightStateSide(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x11
-
     __slots__ = (
-        "_states",
-        "_unknown",
+        "_states",  # LightState[2]
+        "_unknown",  # uint8
     )
 
     def __init__(self,
                  states=(),
                  unknown=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x11)
+        # Left and right light state.
         self.states = states
         self.unknown = unknown
 
@@ -908,7 +1123,7 @@ class LightStateSide(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write_object_farray(self._states, 2)
         writer.write(self._unknown, "B")
@@ -918,7 +1133,7 @@ class LightStateSide(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         states = reader.read_object_farray(LightState.from_reader, 2)
@@ -927,16 +1142,14 @@ class LightStateSide(Packet):
             states=states,
             unknown=unknown)
 
-    
-class Enable(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x25
+class Enable(Packet):
 
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x25)
         pass
 
     def __len__(self):
@@ -949,7 +1162,7 @@ class Enable(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -958,24 +1171,21 @@ class Enable(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
+
 class DriveWheels(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x32
-
     __slots__ = (
-        "_lwheel_speed_mmps",
-        "_rwheel_speed_mmps",
-        "_lwheel_accel_mmps2",
-        "_rwheel_accel_mmps2",
+        "_lwheel_speed_mmps",  # float
+        "_rwheel_speed_mmps",  # float
+        "_lwheel_accel_mmps2",  # float
+        "_rwheel_accel_mmps2",  # float
     )
 
     def __init__(self,
@@ -983,6 +1193,7 @@ class DriveWheels(Packet):
                  rwheel_speed_mmps=0.0,
                  lwheel_accel_mmps2=0.0,
                  rwheel_accel_mmps2=0.0):
+        super().__init__(PacketType.COMMAND, packet_id=0x32)
         self.lwheel_speed_mmps = lwheel_speed_mmps
         self.rwheel_speed_mmps = rwheel_speed_mmps
         self.lwheel_accel_mmps2 = lwheel_accel_mmps2
@@ -1043,7 +1254,7 @@ class DriveWheels(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._lwheel_speed_mmps, "f")
         writer.write(self._rwheel_speed_mmps, "f")
@@ -1055,7 +1266,7 @@ class DriveWheels(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         lwheel_speed_mmps = reader.read("f")
@@ -1068,22 +1279,20 @@ class DriveWheels(Packet):
             lwheel_accel_mmps2=lwheel_accel_mmps2,
             rwheel_accel_mmps2=rwheel_accel_mmps2)
 
-    
+
 class TurnInPlaceAtSpeed(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x33
-
     __slots__ = (
-        "_wheel_speed_mmps",
-        "_wheel_accel_mmps2",
-        "_direction",
+        "_wheel_speed_mmps",  # float
+        "_wheel_accel_mmps2",  # float
+        "_direction",  # int16
     )
 
     def __init__(self,
                  wheel_speed_mmps=0.0,
                  wheel_accel_mmps2=0.0,
                  direction=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x33)
         self.wheel_speed_mmps = wheel_speed_mmps
         self.wheel_accel_mmps2 = wheel_accel_mmps2
         self.direction = direction
@@ -1132,7 +1341,7 @@ class TurnInPlaceAtSpeed(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._wheel_speed_mmps, "f")
         writer.write(self._wheel_accel_mmps2, "f")
@@ -1143,7 +1352,7 @@ class TurnInPlaceAtSpeed(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         wheel_speed_mmps = reader.read("f")
@@ -1154,27 +1363,25 @@ class TurnInPlaceAtSpeed(Packet):
             wheel_accel_mmps2=wheel_accel_mmps2,
             direction=direction)
 
-    
-class DriveLift(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x34
+class MoveLift(Packet):
 
     __slots__ = (
-        "_speed",
+        "_speed_rad_per_sec",  # float
     )
 
     def __init__(self,
-                 speed=0.0):
-        self.speed = speed
+                 speed_rad_per_sec=0.0):
+        super().__init__(PacketType.COMMAND, packet_id=0x34)
+        self.speed_rad_per_sec = speed_rad_per_sec
 
     @property
-    def speed(self):
-        return self._speed
+    def speed_rad_per_sec(self):
+        return self._speed_rad_per_sec
 
-    @speed.setter
-    def speed(self, value):
-        self._speed = validate_float("speed", value)
+    @speed_rad_per_sec.setter
+    def speed_rad_per_sec(self, value):
+        self._speed_rad_per_sec = validate_float("speed_rad_per_sec", value)
 
     def __len__(self):
         return \
@@ -1182,51 +1389,49 @@ class DriveLift(Packet):
 
     def __repr__(self):
         return "{type}(" \
-               "speed={speed})".format(
+               "speed_rad_per_sec={speed_rad_per_sec})".format(
                 type=type(self).__name__,
-                speed=self._speed)
+                speed_rad_per_sec=self._speed_rad_per_sec)
 
     def to_bytes(self):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
-        writer.write(self._speed, "f")
+        writer.write(self._speed_rad_per_sec, "f")
 
     @classmethod
     def from_bytes(cls, buffer):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
-        speed = reader.read("f")
+        speed_rad_per_sec = reader.read("f")
         return cls(
-            speed=speed)
+            speed_rad_per_sec=speed_rad_per_sec)
 
-    
-class DriveHead(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x35
+class MoveHead(Packet):
 
     __slots__ = (
-        "_speed",
+        "_speed_rad_per_sec",  # float
     )
 
     def __init__(self,
-                 speed=0.0):
-        self.speed = speed
+                 speed_rad_per_sec=0.0):
+        super().__init__(PacketType.COMMAND, packet_id=0x35)
+        self.speed_rad_per_sec = speed_rad_per_sec
 
     @property
-    def speed(self):
-        return self._speed
+    def speed_rad_per_sec(self):
+        return self._speed_rad_per_sec
 
-    @speed.setter
-    def speed(self, value):
-        self._speed = validate_float("speed", value)
+    @speed_rad_per_sec.setter
+    def speed_rad_per_sec(self, value):
+        self._speed_rad_per_sec = validate_float("speed_rad_per_sec", value)
 
     def __len__(self):
         return \
@@ -1234,42 +1439,39 @@ class DriveHead(Packet):
 
     def __repr__(self):
         return "{type}(" \
-               "speed={speed})".format(
+               "speed_rad_per_sec={speed_rad_per_sec})".format(
                 type=type(self).__name__,
-                speed=self._speed)
+                speed_rad_per_sec=self._speed_rad_per_sec)
 
     def to_bytes(self):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
-        writer.write(self._speed, "f")
+        writer.write(self._speed_rad_per_sec, "f")
 
     @classmethod
     def from_bytes(cls, buffer):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
-        speed = reader.read("f")
+        speed_rad_per_sec = reader.read("f")
         return cls(
-            speed=speed)
+            speed_rad_per_sec=speed_rad_per_sec)
 
-    
+
 class SetLiftHeight(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x36
-
     __slots__ = (
-        "_height_mm",
-        "_max_speed_rad_per_sec",
-        "_accel_rad_per_sec2",
-        "_duration_sec",
-        "_action_id",
+        "_height_mm",  # float
+        "_max_speed_rad_per_sec",  # float
+        "_accel_rad_per_sec2",  # float
+        "_duration_sec",  # float
+        "_action_id",  # uint8
     )
 
     def __init__(self,
@@ -1278,10 +1480,12 @@ class SetLiftHeight(Packet):
                  accel_rad_per_sec2=20.0,
                  duration_sec=0.0,
                  action_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x36)
         self.height_mm = height_mm
         self.max_speed_rad_per_sec = max_speed_rad_per_sec
         self.accel_rad_per_sec2 = accel_rad_per_sec2
         self.duration_sec = duration_sec
+        # Not present in v2214 and older.
         self.action_id = action_id
 
     @property
@@ -1350,7 +1554,7 @@ class SetLiftHeight(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._height_mm, "f")
         writer.write(self._max_speed_rad_per_sec, "f")
@@ -1363,7 +1567,7 @@ class SetLiftHeight(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         height_mm = reader.read("f")
@@ -1378,18 +1582,15 @@ class SetLiftHeight(Packet):
             duration_sec=duration_sec,
             action_id=action_id)
 
-    
+
 class SetHeadAngle(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x37
-
     __slots__ = (
-        "_angle_rad",
-        "_max_speed_rad_per_sec",
-        "_accel_rad_per_sec2",
-        "_duration_sec",
-        "_action_id",
+        "_angle_rad",  # float
+        "_max_speed_rad_per_sec",  # float
+        "_accel_rad_per_sec2",  # float
+        "_duration_sec",  # float
+        "_action_id",  # uint8
     )
 
     def __init__(self,
@@ -1398,10 +1599,12 @@ class SetHeadAngle(Packet):
                  accel_rad_per_sec2=20.0,
                  duration_sec=0.0,
                  action_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x37)
         self.angle_rad = angle_rad
         self.max_speed_rad_per_sec = max_speed_rad_per_sec
         self.accel_rad_per_sec2 = accel_rad_per_sec2
         self.duration_sec = duration_sec
+        # Not present in v2214 and older.
         self.action_id = action_id
 
     @property
@@ -1470,7 +1673,7 @@ class SetHeadAngle(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._angle_rad, "f")
         writer.write(self._max_speed_rad_per_sec, "f")
@@ -1483,7 +1686,7 @@ class SetHeadAngle(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         angle_rad = reader.read("f")
@@ -1498,21 +1701,18 @@ class SetHeadAngle(Packet):
             duration_sec=duration_sec,
             action_id=action_id)
 
-    
+
 class TurnInPlace(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x39
-
     __slots__ = (
-        "_angle_rad",
-        "_speed_rad_per_sec",
-        "_accel_rad_per_sec2",
-        "_angle_tolerance_rad",
-        "_unknown4",
-        "_unknown5",
-        "_is_absolute",
-        "_action_id",
+        "_angle_rad",  # float
+        "_speed_rad_per_sec",  # float
+        "_accel_rad_per_sec2",  # float
+        "_angle_tolerance_rad",  # float
+        "_unknown4",  # uint8
+        "_unknown5",  # uint8
+        "_is_absolute",  # bool
+        "_action_id",  # uint8
     )
 
     def __init__(self,
@@ -1524,6 +1724,7 @@ class TurnInPlace(Packet):
                  unknown5=0,
                  is_absolute=False,
                  action_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x39)
         self.angle_rad = angle_rad
         self.speed_rad_per_sec = speed_rad_per_sec
         self.accel_rad_per_sec2 = accel_rad_per_sec2
@@ -1632,7 +1833,7 @@ class TurnInPlace(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._angle_rad, "f")
         writer.write(self._speed_rad_per_sec, "f")
@@ -1648,7 +1849,7 @@ class TurnInPlace(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         angle_rad = reader.read("f")
@@ -1669,16 +1870,14 @@ class TurnInPlace(Packet):
             is_absolute=is_absolute,
             action_id=action_id)
 
-    
-class StopAllMotors(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x3b
+class StopAllMotors(Packet):
 
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x3b)
         pass
 
     def __len__(self):
@@ -1691,7 +1890,7 @@ class StopAllMotors(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -1700,76 +1899,124 @@ class StopAllMotors(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
-class DriveStraight(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x3d
+class ClearPath(Packet):
 
     __slots__ = (
-        "_f0",
-        "_f1",
-        "_dist_mm",
-        "_f3",
-        "_speed_mmps",
-        "_f5",
-        "_f6",
+        "_unknown",  # uint16
     )
 
     def __init__(self,
-                 f0=0.0,
-                 f1=0.0,
-                 dist_mm=0.0,
-                 f3=0.0,
+                 unknown=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x3c)
+        self.unknown = unknown
+
+    @property
+    def unknown(self):
+        return self._unknown
+
+    @unknown.setter
+    def unknown(self, value):
+        self._unknown = validate_integer("unknown", value, 0, 65535)
+
+    def __len__(self):
+        return \
+            get_size('H')
+
+    def __repr__(self):
+        return "{type}(" \
+               "unknown={unknown})".format(
+                type=type(self).__name__,
+                unknown=self._unknown)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._unknown, "H")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        unknown = reader.read("H")
+        return cls(
+            unknown=unknown)
+
+
+class AppendPathSegLine(Packet):
+
+    __slots__ = (
+        "_from_x",  # float
+        "_from_y",  # float
+        "_to_x",  # float
+        "_to_y",  # float
+        "_speed_mmps",  # float
+        "_accel_mmps2",  # float
+        "_decel_mmps2",  # float
+    )
+
+    def __init__(self,
+                 from_x=0.0,
+                 from_y=0.0,
+                 to_x=0.0,
+                 to_y=0.0,
                  speed_mmps=0.0,
-                 f5=0.0,
-                 f6=0.0):
-        self.f0 = f0
-        self.f1 = f1
-        self.dist_mm = dist_mm
-        self.f3 = f3
+                 accel_mmps2=0.0,
+                 decel_mmps2=0.0):
+        super().__init__(PacketType.COMMAND, packet_id=0x3d)
+        self.from_x = from_x
+        self.from_y = from_y
+        self.to_x = to_x
+        self.to_y = to_y
         self.speed_mmps = speed_mmps
-        self.f5 = f5
-        self.f6 = f6
+        self.accel_mmps2 = accel_mmps2
+        self.decel_mmps2 = decel_mmps2
 
     @property
-    def f0(self):
-        return self._f0
+    def from_x(self):
+        return self._from_x
 
-    @f0.setter
-    def f0(self, value):
-        self._f0 = validate_float("f0", value)
-
-    @property
-    def f1(self):
-        return self._f1
-
-    @f1.setter
-    def f1(self, value):
-        self._f1 = validate_float("f1", value)
+    @from_x.setter
+    def from_x(self, value):
+        self._from_x = validate_float("from_x", value)
 
     @property
-    def dist_mm(self):
-        return self._dist_mm
+    def from_y(self):
+        return self._from_y
 
-    @dist_mm.setter
-    def dist_mm(self, value):
-        self._dist_mm = validate_float("dist_mm", value)
+    @from_y.setter
+    def from_y(self, value):
+        self._from_y = validate_float("from_y", value)
 
     @property
-    def f3(self):
-        return self._f3
+    def to_x(self):
+        return self._to_x
 
-    @f3.setter
-    def f3(self, value):
-        self._f3 = validate_float("f3", value)
+    @to_x.setter
+    def to_x(self, value):
+        self._to_x = validate_float("to_x", value)
+
+    @property
+    def to_y(self):
+        return self._to_y
+
+    @to_y.setter
+    def to_y(self, value):
+        self._to_y = validate_float("to_y", value)
 
     @property
     def speed_mmps(self):
@@ -1780,20 +2027,20 @@ class DriveStraight(Packet):
         self._speed_mmps = validate_float("speed_mmps", value)
 
     @property
-    def f5(self):
-        return self._f5
+    def accel_mmps2(self):
+        return self._accel_mmps2
 
-    @f5.setter
-    def f5(self, value):
-        self._f5 = validate_float("f5", value)
+    @accel_mmps2.setter
+    def accel_mmps2(self, value):
+        self._accel_mmps2 = validate_float("accel_mmps2", value)
 
     @property
-    def f6(self):
-        return self._f6
+    def decel_mmps2(self):
+        return self._decel_mmps2
 
-    @f6.setter
-    def f6(self, value):
-        self._f6 = validate_float("f6", value)
+    @decel_mmps2.setter
+    def decel_mmps2(self, value):
+        self._decel_mmps2 = validate_float("decel_mmps2", value)
 
     def __len__(self):
         return \
@@ -1807,84 +2054,317 @@ class DriveStraight(Packet):
 
     def __repr__(self):
         return "{type}(" \
-               "f0={f0}, " \
-               "f1={f1}, " \
-               "dist_mm={dist_mm}, " \
-               "f3={f3}, " \
+               "from_x={from_x}, " \
+               "from_y={from_y}, " \
+               "to_x={to_x}, " \
+               "to_y={to_y}, " \
                "speed_mmps={speed_mmps}, " \
-               "f5={f5}, " \
-               "f6={f6})".format(
+               "accel_mmps2={accel_mmps2}, " \
+               "decel_mmps2={decel_mmps2})".format(
                 type=type(self).__name__,
-                f0=self._f0,
-                f1=self._f1,
-                dist_mm=self._dist_mm,
-                f3=self._f3,
+                from_x=self._from_x,
+                from_y=self._from_y,
+                to_x=self._to_x,
+                to_y=self._to_y,
                 speed_mmps=self._speed_mmps,
-                f5=self._f5,
-                f6=self._f6)
+                accel_mmps2=self._accel_mmps2,
+                decel_mmps2=self._decel_mmps2)
 
     def to_bytes(self):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
-        writer.write(self._f0, "f")
-        writer.write(self._f1, "f")
-        writer.write(self._dist_mm, "f")
-        writer.write(self._f3, "f")
+        writer.write(self._from_x, "f")
+        writer.write(self._from_y, "f")
+        writer.write(self._to_x, "f")
+        writer.write(self._to_y, "f")
         writer.write(self._speed_mmps, "f")
-        writer.write(self._f5, "f")
-        writer.write(self._f6, "f")
+        writer.write(self._accel_mmps2, "f")
+        writer.write(self._decel_mmps2, "f")
 
     @classmethod
     def from_bytes(cls, buffer):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
-        f0 = reader.read("f")
-        f1 = reader.read("f")
-        dist_mm = reader.read("f")
-        f3 = reader.read("f")
+        from_x = reader.read("f")
+        from_y = reader.read("f")
+        to_x = reader.read("f")
+        to_y = reader.read("f")
         speed_mmps = reader.read("f")
-        f5 = reader.read("f")
-        f6 = reader.read("f")
+        accel_mmps2 = reader.read("f")
+        decel_mmps2 = reader.read("f")
         return cls(
-            f0=f0,
-            f1=f1,
-            dist_mm=dist_mm,
-            f3=f3,
+            from_x=from_x,
+            from_y=from_y,
+            to_x=to_x,
+            to_y=to_y,
             speed_mmps=speed_mmps,
-            f5=f5,
-            f6=f6)
+            accel_mmps2=accel_mmps2,
+            decel_mmps2=decel_mmps2)
 
-    
-class EnableCamera(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x4c
+class AppendPathSegArc(Packet):
 
     __slots__ = (
-        "_enable",
-        "_unknown",
+        "_center_x",  # float
+        "_center_y",  # float
+        "_radius_mm",  # float
+        "_start_angle_rad",  # float
+        "_sweep_rad",  # float
+        "_speed_mmps",  # float
+        "_accel_mmps2",  # float
+        "_decel_mmps2",  # float
     )
 
     def __init__(self,
-                 enable=False,
-                 unknown=4):
-        self.enable = enable
+                 center_x=0.0,
+                 center_y=0.0,
+                 radius_mm=0.0,
+                 start_angle_rad=0.0,
+                 sweep_rad=0.0,
+                 speed_mmps=0.0,
+                 accel_mmps2=0.0,
+                 decel_mmps2=0.0):
+        super().__init__(PacketType.COMMAND, packet_id=0x3e)
+        self.center_x = center_x
+        self.center_y = center_y
+        self.radius_mm = radius_mm
+        self.start_angle_rad = start_angle_rad
+        self.sweep_rad = sweep_rad
+        self.speed_mmps = speed_mmps
+        self.accel_mmps2 = accel_mmps2
+        self.decel_mmps2 = decel_mmps2
+
+    @property
+    def center_x(self):
+        return self._center_x
+
+    @center_x.setter
+    def center_x(self, value):
+        self._center_x = validate_float("center_x", value)
+
+    @property
+    def center_y(self):
+        return self._center_y
+
+    @center_y.setter
+    def center_y(self, value):
+        self._center_y = validate_float("center_y", value)
+
+    @property
+    def radius_mm(self):
+        return self._radius_mm
+
+    @radius_mm.setter
+    def radius_mm(self, value):
+        self._radius_mm = validate_float("radius_mm", value)
+
+    @property
+    def start_angle_rad(self):
+        return self._start_angle_rad
+
+    @start_angle_rad.setter
+    def start_angle_rad(self, value):
+        self._start_angle_rad = validate_float("start_angle_rad", value)
+
+    @property
+    def sweep_rad(self):
+        return self._sweep_rad
+
+    @sweep_rad.setter
+    def sweep_rad(self, value):
+        self._sweep_rad = validate_float("sweep_rad", value)
+
+    @property
+    def speed_mmps(self):
+        return self._speed_mmps
+
+    @speed_mmps.setter
+    def speed_mmps(self, value):
+        self._speed_mmps = validate_float("speed_mmps", value)
+
+    @property
+    def accel_mmps2(self):
+        return self._accel_mmps2
+
+    @accel_mmps2.setter
+    def accel_mmps2(self, value):
+        self._accel_mmps2 = validate_float("accel_mmps2", value)
+
+    @property
+    def decel_mmps2(self):
+        return self._decel_mmps2
+
+    @decel_mmps2.setter
+    def decel_mmps2(self, value):
+        self._decel_mmps2 = validate_float("decel_mmps2", value)
+
+    def __len__(self):
+        return \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f')
+
+    def __repr__(self):
+        return "{type}(" \
+               "center_x={center_x}, " \
+               "center_y={center_y}, " \
+               "radius_mm={radius_mm}, " \
+               "start_angle_rad={start_angle_rad}, " \
+               "sweep_rad={sweep_rad}, " \
+               "speed_mmps={speed_mmps}, " \
+               "accel_mmps2={accel_mmps2}, " \
+               "decel_mmps2={decel_mmps2})".format(
+                type=type(self).__name__,
+                center_x=self._center_x,
+                center_y=self._center_y,
+                radius_mm=self._radius_mm,
+                start_angle_rad=self._start_angle_rad,
+                sweep_rad=self._sweep_rad,
+                speed_mmps=self._speed_mmps,
+                accel_mmps2=self._accel_mmps2,
+                decel_mmps2=self._decel_mmps2)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._center_x, "f")
+        writer.write(self._center_y, "f")
+        writer.write(self._radius_mm, "f")
+        writer.write(self._start_angle_rad, "f")
+        writer.write(self._sweep_rad, "f")
+        writer.write(self._speed_mmps, "f")
+        writer.write(self._accel_mmps2, "f")
+        writer.write(self._decel_mmps2, "f")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        center_x = reader.read("f")
+        center_y = reader.read("f")
+        radius_mm = reader.read("f")
+        start_angle_rad = reader.read("f")
+        sweep_rad = reader.read("f")
+        speed_mmps = reader.read("f")
+        accel_mmps2 = reader.read("f")
+        decel_mmps2 = reader.read("f")
+        return cls(
+            center_x=center_x,
+            center_y=center_y,
+            radius_mm=radius_mm,
+            start_angle_rad=start_angle_rad,
+            sweep_rad=sweep_rad,
+            speed_mmps=speed_mmps,
+            accel_mmps2=accel_mmps2,
+            decel_mmps2=decel_mmps2)
+
+
+class AppendPathSegPointTurn(Packet):
+
+    __slots__ = (
+        "_x",  # float
+        "_y",  # float
+        "_angle_rad",  # float
+        "_angle_tolerance_rad",  # float
+        "_speed_mmps",  # float
+        "_accel_mmps2",  # float
+        "_decel_mmps2",  # float
+        "_unknown",  # bool
+    )
+
+    def __init__(self,
+                 x=0.0,
+                 y=0.0,
+                 angle_rad=0.0,
+                 angle_tolerance_rad=0.0,
+                 speed_mmps=0.0,
+                 accel_mmps2=0.0,
+                 decel_mmps2=0.0,
+                 unknown=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x3f)
+        self.x = x
+        self.y = y
+        self.angle_rad = angle_rad
+        self.angle_tolerance_rad = angle_tolerance_rad
+        self.speed_mmps = speed_mmps
+        self.accel_mmps2 = accel_mmps2
+        self.decel_mmps2 = decel_mmps2
         self.unknown = unknown
 
     @property
-    def enable(self):
-        return self._enable
+    def x(self):
+        return self._x
 
-    @enable.setter
-    def enable(self, value):
-        self._enable = validate_bool("enable", value)
+    @x.setter
+    def x(self, value):
+        self._x = validate_float("x", value)
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, value):
+        self._y = validate_float("y", value)
+
+    @property
+    def angle_rad(self):
+        return self._angle_rad
+
+    @angle_rad.setter
+    def angle_rad(self, value):
+        self._angle_rad = validate_float("angle_rad", value)
+
+    @property
+    def angle_tolerance_rad(self):
+        return self._angle_tolerance_rad
+
+    @angle_tolerance_rad.setter
+    def angle_tolerance_rad(self, value):
+        self._angle_tolerance_rad = validate_float("angle_tolerance_rad", value)
+
+    @property
+    def speed_mmps(self):
+        return self._speed_mmps
+
+    @speed_mmps.setter
+    def speed_mmps(self, value):
+        self._speed_mmps = validate_float("speed_mmps", value)
+
+    @property
+    def accel_mmps2(self):
+        return self._accel_mmps2
+
+    @accel_mmps2.setter
+    def accel_mmps2(self, value):
+        self._accel_mmps2 = validate_float("accel_mmps2", value)
+
+    @property
+    def decel_mmps2(self):
+        return self._decel_mmps2
+
+    @decel_mmps2.setter
+    def decel_mmps2(self, value):
+        self._decel_mmps2 = validate_float("decel_mmps2", value)
 
     @property
     def unknown(self):
@@ -1892,60 +2372,499 @@ class EnableCamera(Packet):
 
     @unknown.setter
     def unknown(self, value):
-        self._unknown = validate_integer("unknown", value, 0, 255)
+        self._unknown = validate_bool("unknown", value)
 
     def __len__(self):
         return \
-            get_size('b') + \
-            get_size('B')
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('b')
 
     def __repr__(self):
         return "{type}(" \
-               "enable={enable}, " \
+               "x={x}, " \
+               "y={y}, " \
+               "angle_rad={angle_rad}, " \
+               "angle_tolerance_rad={angle_tolerance_rad}, " \
+               "speed_mmps={speed_mmps}, " \
+               "accel_mmps2={accel_mmps2}, " \
+               "decel_mmps2={decel_mmps2}, " \
                "unknown={unknown})".format(
                 type=type(self).__name__,
-                enable=self._enable,
+                x=self._x,
+                y=self._y,
+                angle_rad=self._angle_rad,
+                angle_tolerance_rad=self._angle_tolerance_rad,
+                speed_mmps=self._speed_mmps,
+                accel_mmps2=self._accel_mmps2,
+                decel_mmps2=self._decel_mmps2,
                 unknown=self._unknown)
 
     def to_bytes(self):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
-        writer.write(int(self._enable), "b")
-        writer.write(self._unknown, "B")
+        writer.write(self._x, "f")
+        writer.write(self._y, "f")
+        writer.write(self._angle_rad, "f")
+        writer.write(self._angle_tolerance_rad, "f")
+        writer.write(self._speed_mmps, "f")
+        writer.write(self._accel_mmps2, "f")
+        writer.write(self._decel_mmps2, "f")
+        writer.write(int(self._unknown), "b")
 
     @classmethod
     def from_bytes(cls, buffer):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
-        enable = bool(reader.read("b"))
-        unknown = reader.read("B")
+        x = reader.read("f")
+        y = reader.read("f")
+        angle_rad = reader.read("f")
+        angle_tolerance_rad = reader.read("f")
+        speed_mmps = reader.read("f")
+        accel_mmps2 = reader.read("f")
+        decel_mmps2 = reader.read("f")
+        unknown = bool(reader.read("b"))
         return cls(
-            enable=enable,
+            x=x,
+            y=y,
+            angle_rad=angle_rad,
+            angle_tolerance_rad=angle_tolerance_rad,
+            speed_mmps=speed_mmps,
+            accel_mmps2=accel_mmps2,
+            decel_mmps2=decel_mmps2,
             unknown=unknown)
 
-    
-class SetCameraParams(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x57
+class TrimPath(Packet):
 
     __slots__ = (
-        "_gain",
-        "_exposure_ms",
-        "_auto_exposure_enabled",
+        "_head",  # uint8
+        "_tail",  # uint8
+    )
+
+    def __init__(self,
+                 head=0,
+                 tail=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x40)
+        self.head = head
+        self.tail = tail
+
+    @property
+    def head(self):
+        return self._head
+
+    @head.setter
+    def head(self, value):
+        self._head = validate_integer("head", value, 0, 255)
+
+    @property
+    def tail(self):
+        return self._tail
+
+    @tail.setter
+    def tail(self, value):
+        self._tail = validate_integer("tail", value, 0, 255)
+
+    def __len__(self):
+        return \
+            get_size('B') + \
+            get_size('B')
+
+    def __repr__(self):
+        return "{type}(" \
+               "head={head}, " \
+               "tail={tail})".format(
+                type=type(self).__name__,
+                head=self._head,
+                tail=self._tail)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._head, "B")
+        writer.write(self._tail, "B")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        head = reader.read("B")
+        tail = reader.read("B")
+        return cls(
+            head=head,
+            tail=tail)
+
+
+class ExecutePath(Packet):
+
+    __slots__ = (
+        "_event_id",  # uint16
+        "_unknown",  # bool
+    )
+
+    def __init__(self,
+                 event_id=0,
+                 unknown=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x41)
+        self.event_id = event_id
+        self.unknown = unknown
+
+    @property
+    def event_id(self):
+        return self._event_id
+
+    @event_id.setter
+    def event_id(self, value):
+        self._event_id = validate_integer("event_id", value, 0, 65535)
+
+    @property
+    def unknown(self):
+        return self._unknown
+
+    @unknown.setter
+    def unknown(self, value):
+        self._unknown = validate_bool("unknown", value)
+
+    def __len__(self):
+        return \
+            get_size('H') + \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "event_id={event_id}, " \
+               "unknown={unknown})".format(
+                type=type(self).__name__,
+                event_id=self._event_id,
+                unknown=self._unknown)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._event_id, "H")
+        writer.write(int(self._unknown), "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        event_id = reader.read("H")
+        unknown = bool(reader.read("b"))
+        return cls(
+            event_id=event_id,
+            unknown=unknown)
+
+
+class SetOrigin(Packet):
+
+    __slots__ = (
+        "_unknown0",  # uint32
+        "_pose_frame_id",  # uint32
+        "_pose_origin_id",  # uint32
+        "_pose_x",  # float
+        "_pose_y",  # float
+        "_unknown5",  # uint32
+    )
+
+    def __init__(self,
+                 unknown0=0,
+                 pose_frame_id=0,
+                 pose_origin_id=1,
+                 pose_x=0.0,
+                 pose_y=0.0,
+                 unknown5=2147483648):
+        super().__init__(PacketType.COMMAND, packet_id=0x45)
+        self.unknown0 = unknown0
+        self.pose_frame_id = pose_frame_id
+        self.pose_origin_id = pose_origin_id
+        self.pose_x = pose_x
+        self.pose_y = pose_y
+        self.unknown5 = unknown5
+
+    @property
+    def unknown0(self):
+        return self._unknown0
+
+    @unknown0.setter
+    def unknown0(self, value):
+        self._unknown0 = validate_integer("unknown0", value, 0, 4294967295)
+
+    @property
+    def pose_frame_id(self):
+        return self._pose_frame_id
+
+    @pose_frame_id.setter
+    def pose_frame_id(self, value):
+        self._pose_frame_id = validate_integer("pose_frame_id", value, 0, 4294967295)
+
+    @property
+    def pose_origin_id(self):
+        return self._pose_origin_id
+
+    @pose_origin_id.setter
+    def pose_origin_id(self, value):
+        self._pose_origin_id = validate_integer("pose_origin_id", value, 0, 4294967295)
+
+    @property
+    def pose_x(self):
+        return self._pose_x
+
+    @pose_x.setter
+    def pose_x(self, value):
+        self._pose_x = validate_float("pose_x", value)
+
+    @property
+    def pose_y(self):
+        return self._pose_y
+
+    @pose_y.setter
+    def pose_y(self, value):
+        self._pose_y = validate_float("pose_y", value)
+
+    @property
+    def unknown5(self):
+        return self._unknown5
+
+    @unknown5.setter
+    def unknown5(self, value):
+        self._unknown5 = validate_integer("unknown5", value, 0, 4294967295)
+
+    def __len__(self):
+        return \
+            get_size('L') + \
+            get_size('L') + \
+            get_size('L') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('L')
+
+    def __repr__(self):
+        return "{type}(" \
+               "unknown0={unknown0}, " \
+               "pose_frame_id={pose_frame_id}, " \
+               "pose_origin_id={pose_origin_id}, " \
+               "pose_x={pose_x}, " \
+               "pose_y={pose_y}, " \
+               "unknown5={unknown5})".format(
+                type=type(self).__name__,
+                unknown0=self._unknown0,
+                pose_frame_id=self._pose_frame_id,
+                pose_origin_id=self._pose_origin_id,
+                pose_x=self._pose_x,
+                pose_y=self._pose_y,
+                unknown5=self._unknown5)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._unknown0, "L")
+        writer.write(self._pose_frame_id, "L")
+        writer.write(self._pose_origin_id, "L")
+        writer.write(self._pose_x, "f")
+        writer.write(self._pose_y, "f")
+        writer.write(self._unknown5, "L")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        unknown0 = reader.read("L")
+        pose_frame_id = reader.read("L")
+        pose_origin_id = reader.read("L")
+        pose_x = reader.read("f")
+        pose_y = reader.read("f")
+        unknown5 = reader.read("L")
+        return cls(
+            unknown0=unknown0,
+            pose_frame_id=pose_frame_id,
+            pose_origin_id=pose_origin_id,
+            pose_x=pose_x,
+            pose_y=pose_y,
+            unknown5=unknown5)
+
+
+class SyncTime(Packet):
+
+    __slots__ = (
+        "_timestamp",  # uint32
+        "_unknown",  # uint32
+    )
+
+    def __init__(self,
+                 timestamp=0,
+                 unknown=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x4b)
+        self.timestamp = timestamp
+        self.unknown = unknown
+
+    @property
+    def timestamp(self):
+        return self._timestamp
+
+    @timestamp.setter
+    def timestamp(self, value):
+        self._timestamp = validate_integer("timestamp", value, 0, 4294967295)
+
+    @property
+    def unknown(self):
+        return self._unknown
+
+    @unknown.setter
+    def unknown(self, value):
+        self._unknown = validate_integer("unknown", value, 0, 4294967295)
+
+    def __len__(self):
+        return \
+            get_size('L') + \
+            get_size('L')
+
+    def __repr__(self):
+        return "{type}(" \
+               "timestamp={timestamp}, " \
+               "unknown={unknown})".format(
+                type=type(self).__name__,
+                timestamp=self._timestamp,
+                unknown=self._unknown)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._timestamp, "L")
+        writer.write(self._unknown, "L")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        timestamp = reader.read("L")
+        unknown = reader.read("L")
+        return cls(
+            timestamp=timestamp,
+            unknown=unknown)
+
+
+class EnableCamera(Packet):
+
+    __slots__ = (
+        "_image_send_mode",  # ImageSendMode
+        "_image_resolution",  # ImageResolution
+    )
+
+    def __init__(self,
+                 image_send_mode=1,
+                 image_resolution=4):
+        super().__init__(PacketType.COMMAND, packet_id=0x4c)
+        self.image_send_mode = ImageSendMode(image_send_mode)
+        self.image_resolution = ImageResolution(image_resolution)
+
+    @property
+    def image_send_mode(self) -> ImageSendMode:
+        return self._image_send_mode
+
+    @image_send_mode.setter
+    def image_send_mode(self, value: ImageSendMode) -> None:
+        self._image_send_mode = value
+        validate_integer("image_send_mode", value.value, -128, 127)
+
+    @property
+    def image_resolution(self) -> ImageResolution:
+        return self._image_resolution
+
+    @image_resolution.setter
+    def image_resolution(self, value: ImageResolution) -> None:
+        self._image_resolution = value
+        validate_integer("image_resolution", value.value, -128, 127)
+
+    def __len__(self):
+        return \
+            get_size('b') + \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "image_send_mode={image_send_mode}, " \
+               "image_resolution={image_resolution})".format(
+                type=type(self).__name__,
+                image_send_mode=self._image_send_mode,
+                image_resolution=self._image_resolution)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._image_send_mode.value, "b")
+        writer.write(self._image_resolution.value, "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        image_send_mode = reader.read("b")
+        image_resolution = reader.read("b")
+        return cls(
+            image_send_mode=image_send_mode,
+            image_resolution=image_resolution)
+
+
+class SetCameraParams(Packet):
+
+    __slots__ = (
+        "_gain",  # float
+        "_exposure_ms",  # uint16
+        "_auto_exposure_enabled",  # bool
     )
 
     def __init__(self,
                  gain=0.0,
                  exposure_ms=0,
                  auto_exposure_enabled=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x57)
         self.gain = gain
         self.exposure_ms = exposure_ms
         self.auto_exposure_enabled = auto_exposure_enabled
@@ -1994,7 +2913,7 @@ class SetCameraParams(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._gain, "f")
         writer.write(self._exposure_ms, "H")
@@ -2005,7 +2924,7 @@ class SetCameraParams(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         gain = reader.read("f")
@@ -2016,18 +2935,83 @@ class SetCameraParams(Packet):
             exposure_ms=exposure_ms,
             auto_exposure_enabled=auto_exposure_enabled)
 
-    
-class EnableStopOnCliff(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x60
+class StartMotorCalibration(Packet):
 
     __slots__ = (
-        "_enable",
+        "_head",  # bool
+        "_lift",  # bool
+    )
+
+    def __init__(self,
+                 head=False,
+                 lift=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x58)
+        self.head = head
+        self.lift = lift
+
+    @property
+    def head(self):
+        return self._head
+
+    @head.setter
+    def head(self, value):
+        self._head = validate_bool("head", value)
+
+    @property
+    def lift(self):
+        return self._lift
+
+    @lift.setter
+    def lift(self, value):
+        self._lift = validate_bool("lift", value)
+
+    def __len__(self):
+        return \
+            get_size('b') + \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "head={head}, " \
+               "lift={lift})".format(
+                type=type(self).__name__,
+                head=self._head,
+                lift=self._lift)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(int(self._head), "b")
+        writer.write(int(self._lift), "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        head = bool(reader.read("b"))
+        lift = bool(reader.read("b"))
+        return cls(
+            head=head,
+            lift=lift)
+
+
+class EnableStopOnCliff(Packet):
+
+    __slots__ = (
+        "_enable",  # bool
     )
 
     def __init__(self,
                  enable=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x60)
         self.enable = enable
 
     @property
@@ -2052,7 +3036,7 @@ class EnableStopOnCliff(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(int(self._enable), "b")
 
@@ -2061,25 +3045,23 @@ class EnableStopOnCliff(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         enable = bool(reader.read("b"))
         return cls(
             enable=enable)
 
-    
+
 class SetRobotVolume(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x64
-
     __slots__ = (
-        "_level",
+        "_level",  # uint16
     )
 
     def __init__(self,
                  level=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x64)
         self.level = level
 
     @property
@@ -2104,7 +3086,7 @@ class SetRobotVolume(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._level, "H")
 
@@ -2113,25 +3095,23 @@ class SetRobotVolume(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         level = reader.read("H")
         return cls(
             level=level)
 
-    
+
 class EnableColorImages(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x66
-
     __slots__ = (
-        "_enable",
+        "_enable",  # bool
     )
 
     def __init__(self,
                  enable=False):
+        super().__init__(PacketType.COMMAND, packet_id=0x66)
         self.enable = enable
 
     @property
@@ -2156,7 +3136,7 @@ class EnableColorImages(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(int(self._enable), "b")
 
@@ -2165,35 +3145,33 @@ class EnableColorImages(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         enable = bool(reader.read("b"))
         return cls(
             enable=enable)
 
-    
+
 class NvStorageOp(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x81
-
     __slots__ = (
-        "_tag",
-        "_index",
-        "_op",
-        "_unknown",
-        "_data",
+        "_tag",  # NvEntryTag
+        "_length",  # int32
+        "_op",  # NvOperation
+        "_unknown",  # uint8
+        "_data",  # uint8[uint16]
     )
 
     def __init__(self,
                  tag=4294967295,
-                 index=0,
+                 length=0,
                  op=0,
                  unknown=0,
                  data=()):
+        super().__init__(PacketType.COMMAND, packet_id=0x81)
         self.tag = NvEntryTag(tag)
-        self.index = index
+        self.length = length
         self.op = NvOperation(op)
         self.unknown = unknown
         self.data = data
@@ -2203,24 +3181,24 @@ class NvStorageOp(Packet):
         return self._tag
 
     @tag.setter
-    def tag(self, value: NvEntryTag):
+    def tag(self, value: NvEntryTag) -> None:
         self._tag = value
         validate_integer("tag", value.value, 0, 4294967295)
 
     @property
-    def index(self):
-        return self._index
+    def length(self):
+        return self._length
 
-    @index.setter
-    def index(self, value):
-        self._index = validate_integer("index", value, -2147483648, 2147483647)
+    @length.setter
+    def length(self, value):
+        self._length = validate_integer("length", value, -2147483648, 2147483647)
 
     @property
     def op(self) -> NvOperation:
         return self._op
 
     @op.setter
-    def op(self, value: NvOperation):
+    def op(self, value: NvOperation) -> None:
         self._op = value
         validate_integer("op", value.value, 0, 255)
 
@@ -2252,13 +3230,13 @@ class NvStorageOp(Packet):
     def __repr__(self):
         return "{type}(" \
                "tag={tag}, " \
-               "index={index}, " \
+               "length={length}, " \
                "op={op}, " \
                "unknown={unknown}, " \
                "data={data})".format(
                 type=type(self).__name__,
                 tag=self._tag,
-                index=self._index,
+                length=self._length,
                 op=self._op,
                 unknown=self._unknown,
                 data=self._data)
@@ -2267,10 +3245,10 @@ class NvStorageOp(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._tag.value, "L")
-        writer.write(self._index, "l")
+        writer.write(self._length, "l")
         writer.write(self._op.value, "B")
         writer.write(self._unknown, "B")
         writer.write_varray(self._data, "B", "H")
@@ -2280,33 +3258,67 @@ class NvStorageOp(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         tag = reader.read("L")
-        index = reader.read("l")
+        length = reader.read("l")
         op = reader.read("B")
         unknown = reader.read("B")
         data = reader.read_varray("B", "H")
         return cls(
             tag=tag,
-            index=index,
+            length=length,
             op=op,
             unknown=unknown,
             data=data)
 
-    
-class OutputAudio(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x8e
+class AbortAnimation(Packet):
 
     __slots__ = (
-        "_samples",
+    )
+
+    def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x8d)
+        pass
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return "{type}()".format(type=type(self).__name__)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        pass
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        del reader
+        return cls(
+            )
+
+
+class OutputAudio(Packet):
+
+    __slots__ = (
+        "_samples",  # uint8[744]
     )
 
     def __init__(self,
                  samples=()):
+        super().__init__(PacketType.COMMAND, packet_id=0x8e)
         self.samples = samples
 
     @property
@@ -2332,7 +3344,7 @@ class OutputAudio(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write_farray(self._samples, "B", 744)
 
@@ -2341,23 +3353,21 @@ class OutputAudio(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         samples = reader.read_farray("B", 744)
         return cls(
             samples=samples)
 
-    
-class NextFrame(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x8f
+class NextFrame(Packet):
 
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x8f)
         pass
 
     def __len__(self):
@@ -2370,7 +3380,7 @@ class NextFrame(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -2379,25 +3389,263 @@ class NextFrame(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
-class DisplayImage(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0x97
+class RecordHeading(Packet):
 
     __slots__ = (
-        "_image",
+    )
+
+    def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x91)
+        pass
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return "{type}()".format(type=type(self).__name__)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        pass
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        del reader
+        return cls(
+            )
+
+
+class TurnToRecordedHeading(Packet):
+
+    __slots__ = (
+    )
+
+    def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x92)
+        pass
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return "{type}()".format(type=type(self).__name__)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        pass
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        del reader
+        return cls(
+            )
+
+
+class AnimHead(Packet):
+
+    __slots__ = (
+        "_duration_ms",  # uint8
+        "_variability_deg",  # int8
+        "_angle_deg",  # int8
+    )
+
+    def __init__(self,
+                 duration_ms=0,
+                 variability_deg=0,
+                 angle_deg=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x93)
+        self.duration_ms = duration_ms
+        self.variability_deg = variability_deg
+        self.angle_deg = angle_deg
+
+    @property
+    def duration_ms(self):
+        return self._duration_ms
+
+    @duration_ms.setter
+    def duration_ms(self, value):
+        self._duration_ms = validate_integer("duration_ms", value, 0, 255)
+
+    @property
+    def variability_deg(self):
+        return self._variability_deg
+
+    @variability_deg.setter
+    def variability_deg(self, value):
+        self._variability_deg = validate_integer("variability_deg", value, -128, 127)
+
+    @property
+    def angle_deg(self):
+        return self._angle_deg
+
+    @angle_deg.setter
+    def angle_deg(self, value):
+        self._angle_deg = validate_integer("angle_deg", value, -128, 127)
+
+    def __len__(self):
+        return \
+            get_size('B') + \
+            get_size('b') + \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "duration_ms={duration_ms}, " \
+               "variability_deg={variability_deg}, " \
+               "angle_deg={angle_deg})".format(
+                type=type(self).__name__,
+                duration_ms=self._duration_ms,
+                variability_deg=self._variability_deg,
+                angle_deg=self._angle_deg)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._duration_ms, "B")
+        writer.write(self._variability_deg, "b")
+        writer.write(self._angle_deg, "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        duration_ms = reader.read("B")
+        variability_deg = reader.read("b")
+        angle_deg = reader.read("b")
+        return cls(
+            duration_ms=duration_ms,
+            variability_deg=variability_deg,
+            angle_deg=angle_deg)
+
+
+class AnimLift(Packet):
+
+    __slots__ = (
+        "_duration_ms",  # uint8
+        "_variability_mm",  # uint8
+        "_height_mm",  # uint8
+    )
+
+    def __init__(self,
+                 duration_ms=0,
+                 variability_mm=0,
+                 height_mm=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x94)
+        self.duration_ms = duration_ms
+        self.variability_mm = variability_mm
+        self.height_mm = height_mm
+
+    @property
+    def duration_ms(self):
+        return self._duration_ms
+
+    @duration_ms.setter
+    def duration_ms(self, value):
+        self._duration_ms = validate_integer("duration_ms", value, 0, 255)
+
+    @property
+    def variability_mm(self):
+        return self._variability_mm
+
+    @variability_mm.setter
+    def variability_mm(self, value):
+        self._variability_mm = validate_integer("variability_mm", value, 0, 255)
+
+    @property
+    def height_mm(self):
+        return self._height_mm
+
+    @height_mm.setter
+    def height_mm(self, value):
+        self._height_mm = validate_integer("height_mm", value, 0, 255)
+
+    def __len__(self):
+        return \
+            get_size('B') + \
+            get_size('B') + \
+            get_size('B')
+
+    def __repr__(self):
+        return "{type}(" \
+               "duration_ms={duration_ms}, " \
+               "variability_mm={variability_mm}, " \
+               "height_mm={height_mm})".format(
+                type=type(self).__name__,
+                duration_ms=self._duration_ms,
+                variability_mm=self._variability_mm,
+                height_mm=self._height_mm)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._duration_ms, "B")
+        writer.write(self._variability_mm, "B")
+        writer.write(self._height_mm, "B")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        duration_ms = reader.read("B")
+        variability_mm = reader.read("B")
+        height_mm = reader.read("B")
+        return cls(
+            duration_ms=duration_ms,
+            variability_mm=variability_mm,
+            height_mm=height_mm)
+
+
+class DisplayImage(Packet):
+
+    __slots__ = (
+        "_image",  # uint8[uint16]
     )
 
     def __init__(self,
                  image=()):
+        super().__init__(PacketType.COMMAND, packet_id=0x97)
         self.image = image
 
     @property
@@ -2423,7 +3671,7 @@ class DisplayImage(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write_varray(self._image, "B", "H")
 
@@ -2432,27 +3680,352 @@ class DisplayImage(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         image = reader.read_varray("B", "H")
         return cls(
             image=image)
 
-    
-class FirmwareUpdate(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xaf
+class AnimBackpackLights(Packet):
 
     __slots__ = (
-        "_chunk_id",
-        "_data",
+        "_colors",  # uint16[5]
+    )
+
+    def __init__(self,
+                 colors=()):
+        super().__init__(PacketType.COMMAND, packet_id=0x98)
+        # Left, front, middle, back, and right.
+        self.colors = colors
+
+    @property
+    def colors(self):
+        return self._colors
+
+    @colors.setter
+    def colors(self, value):
+        self._colors = validate_farray(
+            "colors", value, 5, lambda name, value_inner: validate_integer(name, value_inner, 0, 65535))
+
+    def __len__(self):
+        return \
+            get_farray_size('H', 5)
+
+    def __repr__(self):
+        return "{type}(" \
+               "colors={colors})".format(
+                type=type(self).__name__,
+                colors=self._colors)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write_farray(self._colors, "H", 5)
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        colors = reader.read_farray("H", 5)
+        return cls(
+            colors=colors)
+
+
+class AnimBody(Packet):
+
+    __slots__ = (
+        "_speed",  # int16
+        "_unknown",  # int16
+    )
+
+    def __init__(self,
+                 speed=0,
+                 unknown=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x99)
+        self.speed = speed
+        self.unknown = unknown
+
+    @property
+    def speed(self):
+        return self._speed
+
+    @speed.setter
+    def speed(self, value):
+        self._speed = validate_integer("speed", value, -32768, 32767)
+
+    @property
+    def unknown(self):
+        return self._unknown
+
+    @unknown.setter
+    def unknown(self, value):
+        self._unknown = validate_integer("unknown", value, -32768, 32767)
+
+    def __len__(self):
+        return \
+            get_size('h') + \
+            get_size('h')
+
+    def __repr__(self):
+        return "{type}(" \
+               "speed={speed}, " \
+               "unknown={unknown})".format(
+                type=type(self).__name__,
+                speed=self._speed,
+                unknown=self._unknown)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._speed, "h")
+        writer.write(self._unknown, "h")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        speed = reader.read("h")
+        unknown = reader.read("h")
+        return cls(
+            speed=speed,
+            unknown=unknown)
+
+
+class EndAnimation(Packet):
+
+    __slots__ = (
+    )
+
+    def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x9a)
+        pass
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return "{type}()".format(type=type(self).__name__)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        pass
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        del reader
+        return cls(
+            )
+
+
+class StartAnimation(Packet):
+
+    __slots__ = (
+        "_anim_id",  # uint8
+    )
+
+    def __init__(self,
+                 anim_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0x9b)
+        self.anim_id = anim_id
+
+    @property
+    def anim_id(self):
+        return self._anim_id
+
+    @anim_id.setter
+    def anim_id(self, value):
+        self._anim_id = validate_integer("anim_id", value, 0, 255)
+
+    def __len__(self):
+        return \
+            get_size('B')
+
+    def __repr__(self):
+        return "{type}(" \
+               "anim_id={anim_id})".format(
+                type=type(self).__name__,
+                anim_id=self._anim_id)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._anim_id, "B")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        anim_id = reader.read("B")
+        return cls(
+            anim_id=anim_id)
+
+
+class EnableAnimationState(Packet):
+
+    __slots__ = (
+    )
+
+    def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0x9f)
+        pass
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return "{type}()".format(type=type(self).__name__)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        pass
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        del reader
+        return cls(
+            )
+
+
+class ShutdownRobot(Packet):
+
+    __slots__ = (
+    )
+
+    def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0xa9)
+        pass
+
+    def __len__(self):
+        return 0
+
+    def __repr__(self):
+        return "{type}()".format(type=type(self).__name__)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        pass
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        del reader
+        return cls(
+            )
+
+
+class WifiOff(Packet):
+
+    __slots__ = (
+        "_enable",  # bool
+    )
+
+    def __init__(self,
+                 enable=False):
+        super().__init__(PacketType.COMMAND, packet_id=0xae)
+        self.enable = enable
+
+    @property
+    def enable(self):
+        return self._enable
+
+    @enable.setter
+    def enable(self, value):
+        self._enable = validate_bool("enable", value)
+
+    def __len__(self):
+        return \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "enable={enable})".format(
+                type=type(self).__name__,
+                enable=self._enable)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(int(self._enable), "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        enable = bool(reader.read("b"))
+        return cls(
+            enable=enable)
+
+
+class FirmwareUpdate(Packet):
+
+    __slots__ = (
+        "_chunk_id",  # uint16
+        "_data",  # uint8[1024]
     )
 
     def __init__(self,
                  chunk_id=0,
                  data=()):
+        super().__init__(PacketType.COMMAND, packet_id=0xaf)
         self.chunk_id = chunk_id
         self.data = data
 
@@ -2490,7 +4063,7 @@ class FirmwareUpdate(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._chunk_id, "H")
         writer.write_farray(self._data, "B", 1024)
@@ -2500,7 +4073,7 @@ class FirmwareUpdate(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         chunk_id = reader.read("H")
@@ -2509,72 +4082,74 @@ class FirmwareUpdate(Packet):
             chunk_id=chunk_id,
             data=data)
 
-    
-class UnknownB0(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xb0
+class DebugData(Packet):
 
     __slots__ = (
-        "_unknown0",
-        "_unknown1",
-        "_unknown2",
-        "_unknown3",
-        "_unknown4",
+        "_format_id",  # uint16
+        "_unused",  # uint16
+        "_name_id",  # uint16
+        "_level",  # int8
+        "_args",  # uint32[uint8]
     )
 
     def __init__(self,
-                 unknown0=0,
-                 unknown1=0,
-                 unknown2=0,
-                 unknown3=0,
-                 unknown4=()):
-        self.unknown0 = unknown0
-        self.unknown1 = unknown1
-        self.unknown2 = unknown2
-        self.unknown3 = unknown3
-        self.unknown4 = unknown4
+                 format_id=0,
+                 unused=0,
+                 name_id=0,
+                 level=0,
+                 args=()):
+        super().__init__(PacketType.COMMAND, packet_id=0xb0)
+        # AnkiLogStringTables.json formatTable key.
+        self.format_id = format_id
+        # Always 0.
+        self.unused = unused
+        # AnkiLogStringTables.json nameTable key.
+        self.name_id = name_id
+        # Log level. Observed: -1, 1, 2, 3, 5.
+        self.level = level
+        self.args = args
 
     @property
-    def unknown0(self):
-        return self._unknown0
+    def format_id(self):
+        return self._format_id
 
-    @unknown0.setter
-    def unknown0(self, value):
-        self._unknown0 = validate_integer("unknown0", value, 0, 65535)
-
-    @property
-    def unknown1(self):
-        return self._unknown1
-
-    @unknown1.setter
-    def unknown1(self, value):
-        self._unknown1 = validate_integer("unknown1", value, 0, 65535)
+    @format_id.setter
+    def format_id(self, value):
+        self._format_id = validate_integer("format_id", value, 0, 65535)
 
     @property
-    def unknown2(self):
-        return self._unknown2
+    def unused(self):
+        return self._unused
 
-    @unknown2.setter
-    def unknown2(self, value):
-        self._unknown2 = validate_integer("unknown2", value, 0, 65535)
-
-    @property
-    def unknown3(self):
-        return self._unknown3
-
-    @unknown3.setter
-    def unknown3(self, value):
-        self._unknown3 = validate_integer("unknown3", value, -128, 127)
+    @unused.setter
+    def unused(self, value):
+        self._unused = validate_integer("unused", value, 0, 65535)
 
     @property
-    def unknown4(self):
-        return self._unknown4
+    def name_id(self):
+        return self._name_id
 
-    @unknown4.setter
-    def unknown4(self, value):
-        self._unknown4 = validate_varray(
-            "unknown4", value, 255, lambda name, value_inner: validate_integer(name, value_inner, 0, 4294967295))
+    @name_id.setter
+    def name_id(self, value):
+        self._name_id = validate_integer("name_id", value, 0, 65535)
+
+    @property
+    def level(self):
+        return self._level
+
+    @level.setter
+    def level(self, value):
+        self._level = validate_integer("level", value, -128, 127)
+
+    @property
+    def args(self):
+        return self._args
+
+    @args.setter
+    def args(self, value):
+        self._args = validate_varray(
+            "args", value, 255, lambda name, value_inner: validate_integer(name, value_inner, 0, 4294967295))
 
     def __len__(self):
         return \
@@ -2582,67 +4157,64 @@ class UnknownB0(Packet):
             get_size('H') + \
             get_size('H') + \
             get_size('b') + \
-            get_varray_size(self._unknown4, 'B', 'L')
+            get_varray_size(self._args, 'B', 'L')
 
     def __repr__(self):
         return "{type}(" \
-               "unknown0={unknown0}, " \
-               "unknown1={unknown1}, " \
-               "unknown2={unknown2}, " \
-               "unknown3={unknown3}, " \
-               "unknown4={unknown4})".format(
+               "format_id={format_id}, " \
+               "unused={unused}, " \
+               "name_id={name_id}, " \
+               "level={level}, " \
+               "args={args})".format(
                 type=type(self).__name__,
-                unknown0=self._unknown0,
-                unknown1=self._unknown1,
-                unknown2=self._unknown2,
-                unknown3=self._unknown3,
-                unknown4=self._unknown4)
+                format_id=self._format_id,
+                unused=self._unused,
+                name_id=self._name_id,
+                level=self._level,
+                args=self._args)
 
     def to_bytes(self):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
-        writer.write(self._unknown0, "H")
-        writer.write(self._unknown1, "H")
-        writer.write(self._unknown2, "H")
-        writer.write(self._unknown3, "b")
-        writer.write_varray(self._unknown4, "L", "B")
+        writer.write(self._format_id, "H")
+        writer.write(self._unused, "H")
+        writer.write(self._name_id, "H")
+        writer.write(self._level, "b")
+        writer.write_varray(self._args, "L", "B")
 
     @classmethod
     def from_bytes(cls, buffer):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
-        unknown0 = reader.read("H")
-        unknown1 = reader.read("H")
-        unknown2 = reader.read("H")
-        unknown3 = reader.read("b")
-        unknown4 = reader.read_varray("L", "B")
+        format_id = reader.read("H")
+        unused = reader.read("H")
+        name_id = reader.read("H")
+        level = reader.read("b")
+        args = reader.read_varray("L", "B")
         return cls(
-            unknown0=unknown0,
-            unknown1=unknown1,
-            unknown2=unknown2,
-            unknown3=unknown3,
-            unknown4=unknown4)
+            format_id=format_id,
+            unused=unused,
+            name_id=name_id,
+            level=level,
+            args=args)
 
-    
+
 class ObjectMoved(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xb4
-
     __slots__ = (
-        "_timestamp",
-        "_object_id",
-        "_active_accel_x",
-        "_active_accel_y",
-        "_active_accel_z",
-        "_axis_of_accel",
+        "_timestamp",  # uint32
+        "_object_id",  # uint32
+        "_active_accel_x",  # float
+        "_active_accel_y",  # float
+        "_active_accel_z",  # float
+        "_axis_of_accel",  # UpAxis
     )
 
     def __init__(self,
@@ -2652,6 +4224,7 @@ class ObjectMoved(Packet):
                  active_accel_y=0.0,
                  active_accel_z=0.0,
                  axis_of_accel=7):
+        super().__init__(PacketType.COMMAND, packet_id=0xb4)
         self.timestamp = timestamp
         self.object_id = object_id
         self.active_accel_x = active_accel_x
@@ -2704,7 +4277,7 @@ class ObjectMoved(Packet):
         return self._axis_of_accel
 
     @axis_of_accel.setter
-    def axis_of_accel(self, value: UpAxis):
+    def axis_of_accel(self, value: UpAxis) -> None:
         self._axis_of_accel = value
         validate_integer("axis_of_accel", value.value, 0, 255)
 
@@ -2737,7 +4310,7 @@ class ObjectMoved(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._object_id, "L")
@@ -2751,7 +4324,7 @@ class ObjectMoved(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -2768,20 +4341,18 @@ class ObjectMoved(Packet):
             active_accel_z=active_accel_z,
             axis_of_accel=axis_of_accel)
 
-    
+
 class ObjectStoppedMoving(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xb5
-
     __slots__ = (
-        "_timestamp",
-        "_object_id",
+        "_timestamp",  # uint32
+        "_object_id",  # uint32
     )
 
     def __init__(self,
                  timestamp=0,
                  object_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xb5)
         self.timestamp = timestamp
         self.object_id = object_id
 
@@ -2818,7 +4389,7 @@ class ObjectStoppedMoving(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._object_id, "L")
@@ -2828,7 +4399,7 @@ class ObjectStoppedMoving(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -2837,19 +4408,16 @@ class ObjectStoppedMoving(Packet):
             timestamp=timestamp,
             object_id=object_id)
 
-    
+
 class ObjectTapped(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xb6
-
     __slots__ = (
-        "_timestamp",
-        "_object_id",
-        "_num_taps",
-        "_tap_time",
-        "_tap_neg",
-        "_tap_pos",
+        "_timestamp",  # uint32
+        "_object_id",  # uint32
+        "_num_taps",  # uint8
+        "_tap_time",  # uint8
+        "_tap_neg",  # int8
+        "_tap_pos",  # int8
     )
 
     def __init__(self,
@@ -2859,6 +4427,7 @@ class ObjectTapped(Packet):
                  tap_time=0,
                  tap_neg=0,
                  tap_pos=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xb6)
         self.timestamp = timestamp
         self.object_id = object_id
         self.num_taps = num_taps
@@ -2943,7 +4512,7 @@ class ObjectTapped(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._object_id, "L")
@@ -2957,7 +4526,7 @@ class ObjectTapped(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -2974,17 +4543,14 @@ class ObjectTapped(Packet):
             tap_neg=tap_neg,
             tap_pos=tap_pos)
 
-    
+
 class ObjectTapFiltered(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xb9
-
     __slots__ = (
-        "_timestamp",
-        "_object_id",
-        "_time",
-        "_intensity",
+        "_timestamp",  # uint32
+        "_object_id",  # uint32
+        "_time",  # uint8
+        "_intensity",  # uint8
     )
 
     def __init__(self,
@@ -2992,6 +4558,7 @@ class ObjectTapFiltered(Packet):
                  object_id=0,
                  time=0,
                  intensity=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xb9)
         self.timestamp = timestamp
         self.object_id = object_id
         self.time = time
@@ -3052,7 +4619,7 @@ class ObjectTapFiltered(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._object_id, "L")
@@ -3064,7 +4631,7 @@ class ObjectTapFiltered(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -3077,18 +4644,16 @@ class ObjectTapFiltered(Packet):
             time=time,
             intensity=intensity)
 
-    
+
 class AcknowledgeAction(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xc4
-
     __slots__ = (
-        "_action_id",
+        "_action_id",  # uint8
     )
 
     def __init__(self,
                  action_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xc4)
         self.action_id = action_id
 
     @property
@@ -3113,7 +4678,7 @@ class AcknowledgeAction(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._action_id, "B")
 
@@ -3122,23 +4687,21 @@ class AcknowledgeAction(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         action_id = reader.read("B")
         return cls(
             action_id=action_id)
 
-    
+
 class RobotDelocalized(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xc2
-
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0xc2)
         pass
 
     def __len__(self):
@@ -3151,7 +4714,7 @@ class RobotDelocalized(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -3160,23 +4723,21 @@ class RobotDelocalized(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
+
 class RobotPoked(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xc3
-
     __slots__ = (
     )
 
     def __init__(self):
+        super().__init__(PacketType.COMMAND, packet_id=0xc3)
         pass
 
     def __len__(self):
@@ -3189,7 +4750,7 @@ class RobotPoked(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         pass
 
@@ -3198,29 +4759,95 @@ class RobotPoked(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         del reader
         return cls(
             )
 
-    
-class HardwareInfo(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xc9
+class PathFollowingEvent(Packet):
 
     __slots__ = (
-        "_serial_number_head",
-        "_unknown1",
-        "_unknown2",
+        "_event_id",  # uint16
+        "_event_type",  # PathEventType
+    )
+
+    def __init__(self,
+                 event_id=0,
+                 event_type=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xc6)
+        self.event_id = event_id
+        self.event_type = PathEventType(event_type)
+
+    @property
+    def event_id(self):
+        return self._event_id
+
+    @event_id.setter
+    def event_id(self, value):
+        self._event_id = validate_integer("event_id", value, 0, 65535)
+
+    @property
+    def event_type(self) -> PathEventType:
+        return self._event_type
+
+    @event_type.setter
+    def event_type(self, value: PathEventType) -> None:
+        self._event_type = value
+        validate_integer("event_type", value.value, 0, 255)
+
+    def __len__(self):
+        return \
+            get_size('H') + \
+            get_size('B')
+
+    def __repr__(self):
+        return "{type}(" \
+               "event_id={event_id}, " \
+               "event_type={event_type})".format(
+                type=type(self).__name__,
+                event_id=self._event_id,
+                event_type=self._event_type)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._event_id, "H")
+        writer.write(self._event_type.value, "B")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        event_id = reader.read("H")
+        event_type = reader.read("B")
+        return cls(
+            event_id=event_id,
+            event_type=event_type)
+
+
+class HardwareInfo(Packet):
+
+    __slots__ = (
+        "_serial_number_head",  # uint32
+        "_unknown1",  # uint8
+        "_unknown2",  # uint8
     )
 
     def __init__(self,
                  serial_number_head=0,
                  unknown1=0,
                  unknown2=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xc9)
         self.serial_number_head = serial_number_head
         self.unknown1 = unknown1
         self.unknown2 = unknown2
@@ -3269,7 +4896,7 @@ class HardwareInfo(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._serial_number_head, "L")
         writer.write(self._unknown1, "B")
@@ -3280,7 +4907,7 @@ class HardwareInfo(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         serial_number_head = reader.read("L")
@@ -3291,28 +4918,126 @@ class HardwareInfo(Packet):
             unknown1=unknown1,
             unknown2=unknown2)
 
-    
-class NvStorageOpResult(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xcd
+class AnimationStarted(Packet):
 
     __slots__ = (
-        "_tag",
-        "_index",
-        "_op",
-        "_result",
-        "_data",
+        "_anim_id",  # uint8
+    )
+
+    def __init__(self,
+                 anim_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xca)
+        self.anim_id = anim_id
+
+    @property
+    def anim_id(self):
+        return self._anim_id
+
+    @anim_id.setter
+    def anim_id(self, value):
+        self._anim_id = validate_integer("anim_id", value, 0, 255)
+
+    def __len__(self):
+        return \
+            get_size('B')
+
+    def __repr__(self):
+        return "{type}(" \
+               "anim_id={anim_id})".format(
+                type=type(self).__name__,
+                anim_id=self._anim_id)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._anim_id, "B")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        anim_id = reader.read("B")
+        return cls(
+            anim_id=anim_id)
+
+
+class AnimationEnded(Packet):
+
+    __slots__ = (
+        "_anim_id",  # uint8
+    )
+
+    def __init__(self,
+                 anim_id=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xcb)
+        self.anim_id = anim_id
+
+    @property
+    def anim_id(self):
+        return self._anim_id
+
+    @anim_id.setter
+    def anim_id(self, value):
+        self._anim_id = validate_integer("anim_id", value, 0, 255)
+
+    def __len__(self):
+        return \
+            get_size('B')
+
+    def __repr__(self):
+        return "{type}(" \
+               "anim_id={anim_id})".format(
+                type=type(self).__name__,
+                anim_id=self._anim_id)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._anim_id, "B")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        anim_id = reader.read("B")
+        return cls(
+            anim_id=anim_id)
+
+
+class NvStorageOpResult(Packet):
+
+    __slots__ = (
+        "_tag",  # NvEntryTag
+        "_length",  # int32
+        "_op",  # NvOperation
+        "_result",  # NvResult
+        "_data",  # uint8[uint16]
     )
 
     def __init__(self,
                  tag=4294967295,
-                 index=0,
+                 length=0,
                  op=0,
                  result=0,
                  data=()):
+        super().__init__(PacketType.COMMAND, packet_id=0xcd)
         self.tag = NvEntryTag(tag)
-        self.index = index
+        self.length = length
         self.op = NvOperation(op)
         self.result = NvResult(result)
         self.data = data
@@ -3322,24 +5047,24 @@ class NvStorageOpResult(Packet):
         return self._tag
 
     @tag.setter
-    def tag(self, value: NvEntryTag):
+    def tag(self, value: NvEntryTag) -> None:
         self._tag = value
         validate_integer("tag", value.value, 0, 4294967295)
 
     @property
-    def index(self):
-        return self._index
+    def length(self):
+        return self._length
 
-    @index.setter
-    def index(self, value):
-        self._index = validate_integer("index", value, -2147483648, 2147483647)
+    @length.setter
+    def length(self, value):
+        self._length = validate_integer("length", value, -2147483648, 2147483647)
 
     @property
     def op(self) -> NvOperation:
         return self._op
 
     @op.setter
-    def op(self, value: NvOperation):
+    def op(self, value: NvOperation) -> None:
         self._op = value
         validate_integer("op", value.value, 0, 255)
 
@@ -3348,7 +5073,7 @@ class NvStorageOpResult(Packet):
         return self._result
 
     @result.setter
-    def result(self, value: NvResult):
+    def result(self, value: NvResult) -> None:
         self._result = value
         validate_integer("result", value.value, -128, 127)
 
@@ -3372,13 +5097,13 @@ class NvStorageOpResult(Packet):
     def __repr__(self):
         return "{type}(" \
                "tag={tag}, " \
-               "index={index}, " \
+               "length={length}, " \
                "op={op}, " \
                "result={result}, " \
                "data={data})".format(
                 type=type(self).__name__,
                 tag=self._tag,
-                index=self._index,
+                length=self._length,
                 op=self._op,
                 result=self._result,
                 data=self._data)
@@ -3387,10 +5112,10 @@ class NvStorageOpResult(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._tag.value, "L")
-        writer.write(self._index, "l")
+        writer.write(self._length, "l")
         writer.write(self._op.value, "B")
         writer.write(self._result.value, "b")
         writer.write_varray(self._data, "B", "H")
@@ -3400,37 +5125,35 @@ class NvStorageOpResult(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         tag = reader.read("L")
-        index = reader.read("l")
+        length = reader.read("l")
         op = reader.read("B")
         result = reader.read("b")
         data = reader.read_varray("B", "H")
         return cls(
             tag=tag,
-            index=index,
+            length=length,
             op=op,
             result=result,
             data=data)
 
-    
+
 class ObjectPowerLevel(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xce
-
     __slots__ = (
-        "_object_id",
-        "_missed_packets",
-        "_battery_level",
+        "_object_id",  # uint32
+        "_missed_packets",  # uint32
+        "_battery_level",  # uint8
     )
 
     def __init__(self,
                  object_id=0,
                  missed_packets=0,
                  battery_level=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xce)
         self.object_id = object_id
         self.missed_packets = missed_packets
         self.battery_level = battery_level
@@ -3479,7 +5202,7 @@ class ObjectPowerLevel(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._object_id, "L")
         writer.write(self._missed_packets, "L")
@@ -3490,7 +5213,7 @@ class ObjectPowerLevel(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         object_id = reader.read("L")
@@ -3501,17 +5224,14 @@ class ObjectPowerLevel(Packet):
             missed_packets=missed_packets,
             battery_level=battery_level)
 
-    
+
 class ObjectConnectionState(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xd0
-
     __slots__ = (
-        "_object_id",
-        "_factory_id",
-        "_object_type",
-        "_connected",
+        "_object_id",  # uint32
+        "_factory_id",  # uint32
+        "_object_type",  # ObjectType
+        "_connected",  # bool
     )
 
     def __init__(self,
@@ -3519,6 +5239,7 @@ class ObjectConnectionState(Packet):
                  factory_id=0,
                  object_type=-1,
                  connected=False):
+        super().__init__(PacketType.COMMAND, packet_id=0xd0)
         self.object_id = object_id
         self.factory_id = factory_id
         self.object_type = ObjectType(object_type)
@@ -3545,7 +5266,7 @@ class ObjectConnectionState(Packet):
         return self._object_type
 
     @object_type.setter
-    def object_type(self, value: ObjectType):
+    def object_type(self, value: ObjectType) -> None:
         self._object_type = value
         validate_integer("object_type", value.value, -2147483648, 2147483647)
 
@@ -3580,7 +5301,7 @@ class ObjectConnectionState(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._object_id, "L")
         writer.write(self._factory_id, "L")
@@ -3592,7 +5313,7 @@ class ObjectConnectionState(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         object_id = reader.read("L")
@@ -3605,22 +5326,105 @@ class ObjectConnectionState(Packet):
             object_type=object_type,
             connected=connected)
 
-    
-class ObjectUpAxisChanged(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xd7
+class MotorCalibration(Packet):
 
     __slots__ = (
-        "_timestamp",
-        "_object_id",
-        "_axis",
+        "_motor_id",  # MotorID
+        "_calib_started",  # bool
+        "_auto_started",  # bool
+    )
+
+    def __init__(self,
+                 motor_id=0,
+                 calib_started=False,
+                 auto_started=False):
+        super().__init__(PacketType.COMMAND, packet_id=0xd1)
+        self.motor_id = MotorID(motor_id)
+        self.calib_started = calib_started
+        self.auto_started = auto_started
+
+    @property
+    def motor_id(self) -> MotorID:
+        return self._motor_id
+
+    @motor_id.setter
+    def motor_id(self, value: MotorID) -> None:
+        self._motor_id = value
+        validate_integer("motor_id", value.value, 0, 255)
+
+    @property
+    def calib_started(self):
+        return self._calib_started
+
+    @calib_started.setter
+    def calib_started(self, value):
+        self._calib_started = validate_bool("calib_started", value)
+
+    @property
+    def auto_started(self):
+        return self._auto_started
+
+    @auto_started.setter
+    def auto_started(self, value):
+        self._auto_started = validate_bool("auto_started", value)
+
+    def __len__(self):
+        return \
+            get_size('B') + \
+            get_size('b') + \
+            get_size('b')
+
+    def __repr__(self):
+        return "{type}(" \
+               "motor_id={motor_id}, " \
+               "calib_started={calib_started}, " \
+               "auto_started={auto_started})".format(
+                type=type(self).__name__,
+                motor_id=self._motor_id,
+                calib_started=self._calib_started,
+                auto_started=self._auto_started)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._motor_id.value, "B")
+        writer.write(int(self._calib_started), "b")
+        writer.write(int(self._auto_started), "b")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        motor_id = reader.read("B")
+        calib_started = bool(reader.read("b"))
+        auto_started = bool(reader.read("b"))
+        return cls(
+            motor_id=motor_id,
+            calib_started=calib_started,
+            auto_started=auto_started)
+
+
+class ObjectUpAxisChanged(Packet):
+
+    __slots__ = (
+        "_timestamp",  # uint32
+        "_object_id",  # uint32
+        "_axis",  # UpAxis
     )
 
     def __init__(self,
                  timestamp=0,
                  object_id=0,
                  axis=7):
+        super().__init__(PacketType.COMMAND, packet_id=0xd7)
         self.timestamp = timestamp
         self.object_id = object_id
         self.axis = UpAxis(axis)
@@ -3646,7 +5450,7 @@ class ObjectUpAxisChanged(Packet):
         return self._axis
 
     @axis.setter
-    def axis(self, value: UpAxis):
+    def axis(self, value: UpAxis) -> None:
         self._axis = value
         validate_integer("axis", value.value, 0, 255)
 
@@ -3670,7 +5474,7 @@ class ObjectUpAxisChanged(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._object_id, "L")
@@ -3681,7 +5485,7 @@ class ObjectUpAxisChanged(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -3692,18 +5496,16 @@ class ObjectUpAxisChanged(Packet):
             object_id=object_id,
             axis=axis)
 
-    
+
 class ButtonPressed(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xdb
-
     __slots__ = (
-        "_pressed",
+        "_pressed",  # bool
     )
 
     def __init__(self,
                  pressed=False):
+        super().__init__(PacketType.COMMAND, packet_id=0xdb)
         self.pressed = pressed
 
     @property
@@ -3728,7 +5530,7 @@ class ButtonPressed(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(int(self._pressed), "b")
 
@@ -3737,25 +5539,23 @@ class ButtonPressed(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         pressed = bool(reader.read("b"))
         return cls(
             pressed=pressed)
 
-    
+
 class FallingStarted(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xdd
-
     __slots__ = (
-        "_unknown",
+        "_unknown",  # uint32
     )
 
     def __init__(self,
                  unknown=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xdd)
         self.unknown = unknown
 
     @property
@@ -3780,7 +5580,7 @@ class FallingStarted(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._unknown, "L")
 
@@ -3789,29 +5589,27 @@ class FallingStarted(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         unknown = reader.read("L")
         return cls(
             unknown=unknown)
 
-    
+
 class FallingStopped(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xde
-
     __slots__ = (
-        "_unknown",
-        "_duration_ms",
-        "_impact_intensity",
+        "_unknown",  # uint32
+        "_duration_ms",  # uint32
+        "_impact_intensity",  # float
     )
 
     def __init__(self,
                  unknown=0,
                  duration_ms=0,
                  impact_intensity=0.0):
+        super().__init__(PacketType.COMMAND, packet_id=0xde)
         self.unknown = unknown
         self.duration_ms = duration_ms
         self.impact_intensity = impact_intensity
@@ -3860,7 +5658,7 @@ class FallingStopped(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._unknown, "L")
         writer.write(self._duration_ms, "L")
@@ -3871,7 +5669,7 @@ class FallingStopped(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         unknown = reader.read("L")
@@ -3882,23 +5680,22 @@ class FallingStopped(Packet):
             duration_ms=duration_ms,
             impact_intensity=impact_intensity)
 
-    
+
 class BodyInfo(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xed
-
     __slots__ = (
-        "_serial_number",
-        "_body_hw_version",
-        "_body_color",
+        "_serial_number",  # uint32
+        "_body_hw_version",  # uint32
+        "_body_color",  # BodyColor
     )
 
     def __init__(self,
                  serial_number=0,
                  body_hw_version=0,
                  body_color=-1):
+        super().__init__(PacketType.COMMAND, packet_id=0xed)
         self.serial_number = serial_number
+        # Production units report 5. Development units report 7.
         self.body_hw_version = body_hw_version
         self.body_color = BodyColor(body_color)
 
@@ -3923,7 +5720,7 @@ class BodyInfo(Packet):
         return self._body_color
 
     @body_color.setter
-    def body_color(self, value: BodyColor):
+    def body_color(self, value: BodyColor) -> None:
         self._body_color = value
         validate_integer("body_color", value.value, -2147483648, 2147483647)
 
@@ -3947,7 +5744,7 @@ class BodyInfo(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._serial_number, "L")
         writer.write(self._body_hw_version, "L")
@@ -3958,7 +5755,7 @@ class BodyInfo(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         serial_number = reader.read("L")
@@ -3969,20 +5766,19 @@ class BodyInfo(Packet):
             body_hw_version=body_hw_version,
             body_color=body_color)
 
-    
+
 class FirmwareSignature(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xee
-
     __slots__ = (
-        "_unknown",
-        "_signature",
+        "_unknown",  # uint16
+        "_signature",  # str
     )
 
     def __init__(self,
                  unknown=0,
                  signature=''):
+        super().__init__(PacketType.COMMAND, packet_id=0xee)
+        # Last 2 bytes of head s/n?
         self.unknown = unknown
         self.signature = signature
 
@@ -4019,7 +5815,7 @@ class FirmwareSignature(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._unknown, "H")
         writer.write_string(self._signature, "H")
@@ -4029,7 +5825,7 @@ class FirmwareSignature(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         unknown = reader.read("H")
@@ -4038,24 +5834,23 @@ class FirmwareSignature(Packet):
             unknown=unknown,
             signature=signature)
 
-    
+
 class FirmwareUpdateResult(Packet):
 
-    PACKET_ID = PacketType.ACTION
-    ID = 0xef
-
     __slots__ = (
-        "_byte_count",
-        "_chunk_id",
-        "_status",
+        "_byte_count",  # uint32
+        "_chunk_id",  # uint16
+        "_status",  # uint8
     )
 
     def __init__(self,
                  byte_count=0,
                  chunk_id=0,
                  status=0):
+        super().__init__(PacketType.COMMAND, packet_id=0xef)
         self.byte_count = byte_count
         self.chunk_id = chunk_id
+        # 0=OK; 0x0a=complete?
         self.status = status
 
     @property
@@ -4102,7 +5897,7 @@ class FirmwareUpdateResult(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._byte_count, "L")
         writer.write(self._chunk_id, "H")
@@ -4113,7 +5908,7 @@ class FirmwareUpdateResult(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         byte_count = reader.read("L")
@@ -4124,36 +5919,33 @@ class FirmwareUpdateResult(Packet):
             chunk_id=chunk_id,
             status=status)
 
-    
+
 class RobotState(Packet):
 
-    PACKET_ID = PacketType.EVENT
-    ID = 0xf0
-
     __slots__ = (
-        "_timestamp",
-        "_pose_frame_id",
-        "_pose_origin_id",
-        "_pose_x",
-        "_pose_y",
-        "_pose_z",
-        "_pose_angle_rad",
-        "_pose_pitch_rad",
-        "_lwheel_speed_mmps",
-        "_rwheel_speed_mmps",
-        "_head_angle_rad",
-        "_lift_height_mm",
-        "_accel_x",
-        "_accel_y",
-        "_accel_z",
-        "_gyro_x",
-        "_gyro_y",
-        "_gyro_z",
-        "_battery_voltage",
-        "_status",
-        "_cliff_data_raw",
-        "_backpack_touch_sensor_raw",
-        "_curr_path_segment",
+        "_timestamp",  # uint32
+        "_pose_frame_id",  # uint32
+        "_pose_origin_id",  # uint32
+        "_pose_x",  # float
+        "_pose_y",  # float
+        "_pose_z",  # float
+        "_pose_angle_rad",  # float
+        "_pose_pitch_rad",  # float
+        "_lwheel_speed_mmps",  # float
+        "_rwheel_speed_mmps",  # float
+        "_head_angle_rad",  # float
+        "_lift_height_mm",  # float
+        "_accel_x",  # float
+        "_accel_y",  # float
+        "_accel_z",  # float
+        "_gyro_x",  # float
+        "_gyro_y",  # float
+        "_gyro_z",  # float
+        "_battery_voltage",  # float
+        "_status",  # uint32
+        "_cliff_data_raw",  # uint16[4]
+        "_backpack_touch_sensor_raw",  # uint16
+        "_curr_path_segment",  # uint8
     )
 
     def __init__(self,
@@ -4180,6 +5972,7 @@ class RobotState(Packet):
                  cliff_data_raw=(),
                  backpack_touch_sensor_raw=0,
                  curr_path_segment=0):
+        super().__init__(PacketType.EVENT, packet_id=0xf0)
         self.timestamp = timestamp
         self.pose_frame_id = pose_frame_id
         self.pose_origin_id = pose_origin_id
@@ -4469,7 +6262,7 @@ class RobotState(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._pose_frame_id, "L")
@@ -4500,7 +6293,7 @@ class RobotState(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -4551,19 +6344,16 @@ class RobotState(Packet):
             backpack_touch_sensor_raw=backpack_touch_sensor_raw,
             curr_path_segment=curr_path_segment)
 
-    
+
 class AnimationState(Packet):
 
-    PACKET_ID = PacketType.EVENT
-    ID = 0xf1
-
     __slots__ = (
-        "_timestamp",
-        "_num_anim_bytes_played",
-        "_num_audio_frames_played",
-        "_enabled_anim_tracks",
-        "_tag",
-        "_client_drop_count",
+        "_timestamp",  # uint32
+        "_num_anim_bytes_played",  # int32
+        "_num_audio_frames_played",  # int32
+        "_enabled_anim_tracks",  # uint8
+        "_tag",  # uint8
+        "_client_drop_count",  # uint8
     )
 
     def __init__(self,
@@ -4573,11 +6363,13 @@ class AnimationState(Packet):
                  enabled_anim_tracks=0,
                  tag=0,
                  client_drop_count=0):
+        super().__init__(PacketType.EVENT, packet_id=0xf1)
         self.timestamp = timestamp
         self.num_anim_bytes_played = num_anim_bytes_played
         self.num_audio_frames_played = num_audio_frames_played
         self.enabled_anim_tracks = enabled_anim_tracks
         self.tag = tag
+        # Not present in v2214 and older.
         self.client_drop_count = client_drop_count
 
     @property
@@ -4657,7 +6449,7 @@ class AnimationState(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._timestamp, "L")
         writer.write(self._num_anim_bytes_played, "l")
@@ -4671,7 +6463,7 @@ class AnimationState(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         timestamp = reader.read("L")
@@ -4688,22 +6480,19 @@ class AnimationState(Packet):
             tag=tag,
             client_drop_count=client_drop_count)
 
-    
+
 class ImageChunk(Packet):
 
-    PACKET_ID = PacketType.EVENT
-    ID = 0xf2
-
     __slots__ = (
-        "_frame_timestamp",
-        "_image_id",
-        "_chunk_debug",
-        "_image_encoding",
-        "_image_resolution",
-        "_image_chunk_count",
-        "_chunk_id",
-        "_status",
-        "_data",
+        "_frame_timestamp",  # uint32
+        "_image_id",  # uint32
+        "_chunk_debug",  # uint32
+        "_image_encoding",  # ImageEncoding
+        "_image_resolution",  # ImageResolution
+        "_image_chunk_count",  # uint8
+        "_chunk_id",  # uint8
+        "_status",  # uint16
+        "_data",  # uint8[uint16]
     )
 
     def __init__(self,
@@ -4716,6 +6505,7 @@ class ImageChunk(Packet):
                  chunk_id=0,
                  status=0,
                  data=()):
+        super().__init__(PacketType.EVENT, packet_id=0xf2)
         self.frame_timestamp = frame_timestamp
         self.image_id = image_id
         self.chunk_debug = chunk_debug
@@ -4755,7 +6545,7 @@ class ImageChunk(Packet):
         return self._image_encoding
 
     @image_encoding.setter
-    def image_encoding(self, value: ImageEncoding):
+    def image_encoding(self, value: ImageEncoding) -> None:
         self._image_encoding = value
         validate_integer("image_encoding", value.value, -128, 127)
 
@@ -4764,7 +6554,7 @@ class ImageChunk(Packet):
         return self._image_resolution
 
     @image_resolution.setter
-    def image_resolution(self, value: ImageResolution):
+    def image_resolution(self, value: ImageResolution) -> None:
         self._image_resolution = value
         validate_integer("image_resolution", value.value, -128, 127)
 
@@ -4839,7 +6629,7 @@ class ImageChunk(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._frame_timestamp, "L")
         writer.write(self._image_id, "L")
@@ -4856,7 +6646,7 @@ class ImageChunk(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         frame_timestamp = reader.read("L")
@@ -4879,22 +6669,20 @@ class ImageChunk(Packet):
             status=status,
             data=data)
 
-    
+
 class ObjectAvailable(Packet):
 
-    PACKET_ID = PacketType.EVENT
-    ID = 0xf3
-
     __slots__ = (
-        "_factory_id",
-        "_object_type",
-        "_rssi",
+        "_factory_id",  # uint32
+        "_object_type",  # ObjectType
+        "_rssi",  # int8
     )
 
     def __init__(self,
                  factory_id=0,
                  object_type=-1,
                  rssi=0):
+        super().__init__(PacketType.EVENT, packet_id=0xf3)
         self.factory_id = factory_id
         self.object_type = ObjectType(object_type)
         self.rssi = rssi
@@ -4912,7 +6700,7 @@ class ObjectAvailable(Packet):
         return self._object_type
 
     @object_type.setter
-    def object_type(self, value: ObjectType):
+    def object_type(self, value: ObjectType) -> None:
         self._object_type = value
         validate_integer("object_type", value.value, -2147483648, 2147483647)
 
@@ -4944,7 +6732,7 @@ class ObjectAvailable(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._factory_id, "L")
         writer.write(self._object_type.value, "l")
@@ -4955,7 +6743,7 @@ class ObjectAvailable(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         factory_id = reader.read("L")
@@ -4966,18 +6754,15 @@ class ObjectAvailable(Packet):
             object_type=object_type,
             rssi=rssi)
 
-    
+
 class ImageImuData(Packet):
 
-    PACKET_ID = PacketType.EVENT
-    ID = 0xf4
-
     __slots__ = (
-        "_image_id",
-        "_rate_x",
-        "_rate_y",
-        "_rate_z",
-        "_line_2_number",
+        "_image_id",  # uint32
+        "_rate_x",  # float
+        "_rate_y",  # float
+        "_rate_z",  # float
+        "_line_2_number",  # uint8
     )
 
     def __init__(self,
@@ -4986,6 +6771,7 @@ class ImageImuData(Packet):
                  rate_y=0.0,
                  rate_z=0.0,
                  line_2_number=0):
+        super().__init__(PacketType.EVENT, packet_id=0xf4)
         self.image_id = image_id
         self.rate_x = rate_x
         self.rate_y = rate_y
@@ -5058,7 +6844,7 @@ class ImageImuData(Packet):
         writer = BinaryWriter()
         self.to_writer(writer)
         return writer.dumps()
-        
+
     def to_writer(self, writer):
         writer.write(self._image_id, "L")
         writer.write(self._rate_x, "f")
@@ -5071,7 +6857,7 @@ class ImageImuData(Packet):
         reader = BinaryReader(buffer)
         obj = cls.from_reader(reader)
         return obj
-        
+
     @classmethod
     def from_reader(cls, reader):
         image_id = reader.read("L")
@@ -5087,34 +6873,174 @@ class ImageImuData(Packet):
             line_2_number=line_2_number)
 
 
-ACTION_BY_ID = {
+class ObjectAccel(Packet):
+
+    __slots__ = (
+        "_timestamp",  # uint32
+        "_object_id",  # uint32
+        "_accel_x",  # float
+        "_accel_y",  # float
+        "_accel_z",  # float
+    )
+
+    def __init__(self,
+                 timestamp=0,
+                 object_id=0,
+                 accel_x=0.0,
+                 accel_y=0.0,
+                 accel_z=0.0):
+        super().__init__(PacketType.EVENT, packet_id=0xf5)
+        self.timestamp = timestamp
+        self.object_id = object_id
+        self.accel_x = accel_x
+        self.accel_y = accel_y
+        self.accel_z = accel_z
+
+    @property
+    def timestamp(self):
+        return self._timestamp
+
+    @timestamp.setter
+    def timestamp(self, value):
+        self._timestamp = validate_integer("timestamp", value, 0, 4294967295)
+
+    @property
+    def object_id(self):
+        return self._object_id
+
+    @object_id.setter
+    def object_id(self, value):
+        self._object_id = validate_integer("object_id", value, 0, 4294967295)
+
+    @property
+    def accel_x(self):
+        return self._accel_x
+
+    @accel_x.setter
+    def accel_x(self, value):
+        self._accel_x = validate_float("accel_x", value)
+
+    @property
+    def accel_y(self):
+        return self._accel_y
+
+    @accel_y.setter
+    def accel_y(self, value):
+        self._accel_y = validate_float("accel_y", value)
+
+    @property
+    def accel_z(self):
+        return self._accel_z
+
+    @accel_z.setter
+    def accel_z(self, value):
+        self._accel_z = validate_float("accel_z", value)
+
+    def __len__(self):
+        return \
+            get_size('L') + \
+            get_size('L') + \
+            get_size('f') + \
+            get_size('f') + \
+            get_size('f')
+
+    def __repr__(self):
+        return "{type}(" \
+               "timestamp={timestamp}, " \
+               "object_id={object_id}, " \
+               "accel_x={accel_x}, " \
+               "accel_y={accel_y}, " \
+               "accel_z={accel_z})".format(
+                type=type(self).__name__,
+                timestamp=self._timestamp,
+                object_id=self._object_id,
+                accel_x=self._accel_x,
+                accel_y=self._accel_y,
+                accel_z=self._accel_z)
+
+    def to_bytes(self):
+        writer = BinaryWriter()
+        self.to_writer(writer)
+        return writer.dumps()
+
+    def to_writer(self, writer):
+        writer.write(self._timestamp, "L")
+        writer.write(self._object_id, "L")
+        writer.write(self._accel_x, "f")
+        writer.write(self._accel_y, "f")
+        writer.write(self._accel_z, "f")
+
+    @classmethod
+    def from_bytes(cls, buffer):
+        reader = BinaryReader(buffer)
+        obj = cls.from_reader(reader)
+        return obj
+
+    @classmethod
+    def from_reader(cls, reader):
+        timestamp = reader.read("L")
+        object_id = reader.read("L")
+        accel_x = reader.read("f")
+        accel_y = reader.read("f")
+        accel_z = reader.read("f")
+        return cls(
+            timestamp=timestamp,
+            object_id=object_id,
+            accel_x=accel_x,
+            accel_y=accel_y,
+            accel_z=accel_z)
+
+
+PACKETS_BY_ID = {
     0x03: LightStateCenter,  # 3
     0x04: CubeLights,  # 4
     0x05: ObjectConnect,  # 5
+    0x08: StreamObjectAccel,  # 8
+    0x0a: SetAccessoryDiscovery,  # 10
     0x0b: SetHeadLight,  # 11
     0x10: CubeId,  # 16
     0x11: LightStateSide,  # 17
     0x25: Enable,  # 37
     0x32: DriveWheels,  # 50
     0x33: TurnInPlaceAtSpeed,  # 51
-    0x34: DriveLift,  # 52
-    0x35: DriveHead,  # 53
+    0x34: MoveLift,  # 52
+    0x35: MoveHead,  # 53
     0x36: SetLiftHeight,  # 54
     0x37: SetHeadAngle,  # 55
     0x39: TurnInPlace,  # 57
     0x3b: StopAllMotors,  # 59
-    0x3d: DriveStraight,  # 61
+    0x3c: ClearPath,  # 60
+    0x3d: AppendPathSegLine,  # 61
+    0x3e: AppendPathSegArc,  # 62
+    0x3f: AppendPathSegPointTurn,  # 63
+    0x40: TrimPath,  # 64
+    0x41: ExecutePath,  # 65
+    0x45: SetOrigin,  # 69
+    0x4b: SyncTime,  # 75
     0x4c: EnableCamera,  # 76
     0x57: SetCameraParams,  # 87
+    0x58: StartMotorCalibration,  # 88
     0x60: EnableStopOnCliff,  # 96
     0x64: SetRobotVolume,  # 100
     0x66: EnableColorImages,  # 102
     0x81: NvStorageOp,  # 129
+    0x8d: AbortAnimation,  # 141
     0x8e: OutputAudio,  # 142
     0x8f: NextFrame,  # 143
+    0x91: RecordHeading,  # 145
+    0x92: TurnToRecordedHeading,  # 146
+    0x93: AnimHead,  # 147
+    0x94: AnimLift,  # 148
     0x97: DisplayImage,  # 151
+    0x98: AnimBackpackLights,  # 152
+    0x99: AnimBody,  # 153
+    0x9a: EndAnimation,  # 154
+    0x9b: StartAnimation,  # 155
+    0x9f: EnableAnimationState,  # 159
+    0xa9: ShutdownRobot,  # 169
+    0xae: WifiOff,  # 174
     0xaf: FirmwareUpdate,  # 175
-    0xb0: UnknownB0,  # 176
+    0xb0: DebugData,  # 176
     0xb4: ObjectMoved,  # 180
     0xb5: ObjectStoppedMoving,  # 181
     0xb6: ObjectTapped,  # 182
@@ -5122,10 +7048,14 @@ ACTION_BY_ID = {
     0xc2: RobotDelocalized,  # 194
     0xc3: RobotPoked,  # 195
     0xc4: AcknowledgeAction,  # 196
+    0xc6: PathFollowingEvent,  # 198
     0xc9: HardwareInfo,  # 201
+    0xca: AnimationStarted,  # 202
+    0xcb: AnimationEnded,  # 203
     0xcd: NvStorageOpResult,  # 205
     0xce: ObjectPowerLevel,  # 206
     0xd0: ObjectConnectionState,  # 208
+    0xd1: MotorCalibration,  # 209
     0xd7: ObjectUpAxisChanged,  # 215
     0xdb: ButtonPressed,  # 219
     0xdd: FallingStarted,  # 221
@@ -5133,13 +7063,117 @@ ACTION_BY_ID = {
     0xed: BodyInfo,  # 237
     0xee: FirmwareSignature,  # 238
     0xef: FirmwareUpdateResult,  # 239
-}
-
-
-EVENT_BY_ID = {
     0xf0: RobotState,  # 240
     0xf1: AnimationState,  # 241
     0xf2: ImageChunk,  # 242
     0xf3: ObjectAvailable,  # 243
     0xf4: ImageImuData,  # 244
+    0xf5: ObjectAccel,  # 245
+}
+
+
+PACKETS_BY_GROUP = {
+    "anim": {
+        0x8d,  # AbortAnimation
+        0x91,  # RecordHeading
+        0x92,  # TurnToRecordedHeading
+        0x93,  # AnimHead
+        0x94,  # AnimLift
+        0x98,  # AnimBackpackLights
+        0x99,  # AnimBody
+        0x9a,  # EndAnimation
+        0x9b,  # StartAnimation
+        0xca,  # AnimationStarted
+        0xcb,  # AnimationEnded
+    },
+    "audio": {
+        0x64,  # SetRobotVolume
+        0x8e,  # OutputAudio
+    },
+    "camera": {
+        0x0b,  # SetHeadLight
+        0x4c,  # EnableCamera
+        0x57,  # SetCameraParams
+        0x66,  # EnableColorImages
+    },
+    "debug": {
+        0xb0,  # DebugData
+    },
+    "display": {
+        0x8f,  # NextFrame
+        0x97,  # DisplayImage
+    },
+    "firmware": {
+        0xaf,  # FirmwareUpdate
+        0xef,  # FirmwareUpdateResult
+    },
+    "lights": {
+        0x03,  # LightStateCenter
+        0x11,  # LightStateSide
+    },
+    "localization": {
+        0x45,  # SetOrigin
+        0xc2,  # RobotDelocalized
+        0xc3,  # RobotPoked
+        0xdd,  # FallingStarted
+        0xde,  # FallingStopped
+    },
+    "motors": {
+        0x32,  # DriveWheels
+        0x33,  # TurnInPlaceAtSpeed
+        0x34,  # MoveLift
+        0x35,  # MoveHead
+        0x36,  # SetLiftHeight
+        0x37,  # SetHeadAngle
+        0x39,  # TurnInPlace
+        0x3b,  # StopAllMotors
+        0x3c,  # ClearPath
+        0x3d,  # AppendPathSegLine
+        0x3e,  # AppendPathSegArc
+        0x3f,  # AppendPathSegPointTurn
+        0x40,  # TrimPath
+        0x41,  # ExecutePath
+        0x58,  # StartMotorCalibration
+        0x60,  # EnableStopOnCliff
+        0xc4,  # AcknowledgeAction
+        0xc6,  # PathFollowingEvent
+        0xd1,  # MotorCalibration
+    },
+    "nv": {
+        0x81,  # NvStorageOp
+        0xcd,  # NvStorageOpResult
+    },
+    "objects": {
+        0x04,  # CubeLights
+        0x05,  # ObjectConnect
+        0x08,  # StreamObjectAccel
+        0x0a,  # SetAccessoryDiscovery
+        0x10,  # CubeId
+        0xb4,  # ObjectMoved
+        0xb5,  # ObjectStoppedMoving
+        0xb6,  # ObjectTapped
+        0xb9,  # ObjectTapFiltered
+        0xce,  # ObjectPowerLevel
+        0xd0,  # ObjectConnectionState
+        0xd7,  # ObjectUpAxisChanged
+    },
+    "state": {
+        0xf0,  # RobotState
+        0xf1,  # AnimationState
+        0xf2,  # ImageChunk
+        0xf3,  # ObjectAvailable
+        0xf4,  # ImageImuData
+        0xf5,  # ObjectAccel
+    },
+    "system": {
+        0x25,  # Enable
+        0x4b,  # SyncTime
+        0x9f,  # EnableAnimationState
+        0xa9,  # ShutdownRobot
+        0xae,  # WifiOff
+        0xc9,  # HardwareInfo
+        0xdb,  # ButtonPressed
+        0xed,  # BodyInfo
+        0xee,  # FirmwareSignature
+    },
 }
